@@ -69,6 +69,11 @@ flutter:
     - assets/images/Sinal4.jpg
     - assets/images/Sinal5.jpg
     - assets/images/Sinal6.jpg
+    - assets/images/imagemHome.png
+    - assets/images/imagemUsoHome1.png
+    - assets/images/imagemUsoHome2.png
+    - assets/images/ImagemUsoHome3.png
+    - assets/images/ImagemUsoHome4.png
 
 
   # To add assets to your application, add an assets section, like this:

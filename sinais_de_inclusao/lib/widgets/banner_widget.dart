@@ -12,66 +12,66 @@ class _BannerWidgetState extends State<BannerWidget> {
   @override
   Widget build(BuildContext context){
     return Container(
-      height: 600,
       width: double.infinity,
       padding: const EdgeInsets.all(18.0),
       color: Color(0xFF152763),
-      child : Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Sinais de Inclusão',
-            style: TextStyle(
-              color: Color(0xFFEDAD6B),
-              fontSize: 28,
+      child : SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Sinais de Inclusão',
+              style: TextStyle(
+                color: Color(0xFFEDAD6B),
+                fontSize: 28,
+              ),
             ),
-          ),
 
-          Text(
-          'Um aplicativo que ensina Libras de forma prática, dinâmica e gratuita.',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
+            Text(
+            'Um aplicativo que ensina Libras de forma prática, dinâmica e gratuita.',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+              ),
             ),
-          ),
 
-          SizedBox(height: 24),
-          Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    //Direcionar para a página de cadastro
-                  }, 
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFEDAD6B),
-                    minimumSize: Size(150, 50)
+            SizedBox(height: 24),
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      //Direcionar para a página de cadastro
+                    }, 
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFEDAD6B),
+                      minimumSize: Size(150, 50)
+                    ),
+                    child: Text('Cadastrar'),
                   ),
-                  child: Text('Cadastrar'),
-                ),
 
-                SizedBox(height: 16),
+                  SizedBox(height: 16),
 
-                ElevatedButton(onPressed: () {
-                  //Direcionar para a página de login
-                  }, 
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFEDAD6B),
-                    minimumSize: Size(150, 50)
+                  ElevatedButton(onPressed: () {
+                    //Direcionar para a página de login
+                    }, 
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFEDAD6B),
+                      minimumSize: Size(150, 50)
+                    ),
+                    child: Text('Login'),
                   ),
-                  child: Text('Login'),
-                ),
 
-                SizedBox(height: 24),
-                const CarouselImages(),
+                  SizedBox(height: 24),
+                  const CarouselImages(),
+                ],
+              ),
+            )
+          ],
 
-              ],
-            ),
-          )
-        ],
-
+        )
       )
     );
   }
