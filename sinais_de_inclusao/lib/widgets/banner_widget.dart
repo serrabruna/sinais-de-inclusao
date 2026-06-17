@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sinais_de_inclusao/widgets/carousel_images.dart';
 
-class BannerWidget extends StatefulWidget{
+class BannerWidget extends StatefulWidget {
   const BannerWidget({super.key});
 
   @override
@@ -10,33 +10,29 @@ class BannerWidget extends StatefulWidget{
 
 class _BannerWidgetState extends State<BannerWidget> {
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18.0),
-      color: Color(0xFF152763),
-      child : SingleChildScrollView(
+      color: Color(0xFF7458CF),
+      child: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
               'Sinais de Inclusão',
-              style: TextStyle(
-                color: Color(0xFFEDAD6B),
-                fontSize: 28,
-              ),
+              style: TextStyle(color: Colors.white, fontSize: 28),
+              textAlign: TextAlign.center,
             ),
-
-            Text(
-            'Um aplicativo que ensina Libras de forma prática, dinâmica e gratuita.',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-              ),
-            ),
-
             SizedBox(height: 24),
+            Text(
+              'Um aplicativo que ensina Libras de forma prática, dinâmica e gratuita.',
+              style: TextStyle(color: Colors.white, fontSize: 18),
+              textAlign: TextAlign.center,
+            ),
+
+            SizedBox(height: 26),
             Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -44,35 +40,41 @@ class _BannerWidgetState extends State<BannerWidget> {
                   ElevatedButton(
                     onPressed: () {
                       //Direcionar para a página de cadastro
-                    }, 
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFEDAD6B),
-                      minimumSize: Size(150, 50)
+                      minimumSize: Size(150, 50),
                     ),
-                    child: Text('Cadastrar'),
+                    child: Text(
+                      'Cadastrar',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
                   ),
 
                   SizedBox(height: 16),
 
-                  ElevatedButton(onPressed: () {
-                    //Direcionar para a página de login
-                    }, 
+                  ElevatedButton(
+                    onPressed: () {
+                      //Direcionar para a página de login
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFEDAD6B),
-                      minimumSize: Size(150, 50)
+                      minimumSize: Size(150, 50),
                     ),
-                    child: Text('Login'),
+                    child: Text(
+                      'Login',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
                   ),
 
                   SizedBox(height: 24),
                   const CarouselImages(),
                 ],
               ),
-            )
+            ),
           ],
-
-        )
-      )
+        ),
+      ),
     );
   }
 }

@@ -18,7 +18,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 100,
-        backgroundColor: const Color(0xFF152763),
+        backgroundColor: const  Color(0xFF7458CF),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -31,13 +31,13 @@ class _HomePageState extends State<HomePage> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       drawer: Drawer(
-        backgroundColor: const Color(0xFF152763),
+        backgroundColor: const  Color(0xFF7458CF),
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
             const DrawerHeader(
               decoration: BoxDecoration(
-                color: Color(0xFF152763),
+                color:  Color(0xFF7458CF),
               ),
               child: Text (
                 'Menu',
@@ -107,7 +107,7 @@ class _HomePageState extends State<HomePage> {
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF152763),
+                  color:  Color(0xFF7458CF),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -122,7 +122,7 @@ class _HomePageState extends State<HomePage> {
                   'Aprenda Conosco!',
                   style: TextStyle(
                     fontSize: 24,
-                    color: Color(0xFF435DB3),
+                    color:  Color(0xFF7458CF),
                   ),
                   textAlign: TextAlign.center,
                 ),

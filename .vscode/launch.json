@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "sinais_de_inclusao",
+            "cwd": "sinais_de_inclusao",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "sinais_de_inclusao (profile mode)",
+            "cwd": "sinais_de_inclusao",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "sinais_de_inclusao (release mode)",
+            "cwd": "sinais_de_inclusao",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}
