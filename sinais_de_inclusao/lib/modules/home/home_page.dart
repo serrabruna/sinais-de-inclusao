@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
         toolbarHeight: 100,
         backgroundColor: const  Color(0xFF7458CF),
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Image.asset(
               'assets/images/logocirculo.png',
@@ -30,66 +30,7 @@ class _HomePageState extends State<HomePage> {
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      drawer: Drawer(
-        backgroundColor: const  Color(0xFF7458CF),
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color:  Color(0xFF7458CF),
-              ),
-              child: Text (
-                'Menu',
-                style:TextStyle(
-                  color: Colors.white,
-                  fontSize: 2,
-                )
-              )
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Home'),
-              iconColor: Colors.white,
-              textColor: Colors.white,
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.group),
-              title: const Text('Equipe'),
-              iconColor: Colors.white,
-              textColor: Colors.white,
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.contact_mail),
-              title: const Text('Contato'),
-              iconColor: Colors.white,
-              textColor: Colors.white,
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.description),
-              title: const Text('Plano'),
-              iconColor: Colors.white,
-              textColor: Colors.white,
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
+      
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
