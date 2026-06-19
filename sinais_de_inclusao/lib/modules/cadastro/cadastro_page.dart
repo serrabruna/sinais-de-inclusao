@@ -1,84 +1,85 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
-import 'package:dio/dio.dart';
-import 'package:sinais_de_inclusao/http/dio_client.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class CadastroPage extends StatefulWidget {
+  const CadastroPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<CadastroPage> createState() => _CadastroPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _CadastroPageState extends State<CadastroPage> {
+  late TextEditingController _nomeController;
   late TextEditingController _emailController;
   late TextEditingController _senhaController;
+  late TextEditingController _senhaConfirmacaoController;
 
-  final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'https://sinais-de-inclusao-api.onrender.com',
-    connectTimeout: const Duration(seconds: 5),
-  ));
+  // Variável para armazenar o perfil selecionado
+  String? _perfilSelecionado;
+
+  final List<String> _opcoesPerfil = ['Admin', 'Aluno'];
 
   bool _carregando = false;
 
   @override
   void initState() {
     super.initState();
+    _nomeController = TextEditingController();
     _emailController = TextEditingController();
     _senhaController = TextEditingController();
+    _senhaConfirmacaoController = TextEditingController();
   }
 
   @override
   void dispose() {
+    _nomeController.dispose();
     _emailController.dispose();
     _senhaController.dispose();
+    _senhaConfirmacaoController.dispose();
     super.dispose();
   }
 
-  Future<void> _enviarDados() async {
-    String email = _emailController.text.trim();
-    String senha = _senhaController.text.trim();
+  void _enviarDados() async {
+    String nome = _nomeController.text;
+    String email = _emailController.text;
+    String senha = _senhaController.text;
+    String confirmacao = _senhaConfirmacaoController.text;
 
-    if (email.isEmpty || senha.isEmpty) {
+    if (nome.trim().isEmpty ||
+        email.trim().isEmpty ||
+        senha.trim().isEmpty ||
+        confirmacao.trim().isEmpty ||
+        _perfilSelecionado == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, preencha todos os campos!')),
+        const SnackBar(
+          content: Text(
+            'Por favor, preencha todos os campos e escolha o perfil!',
+          ),
+        ),
       );
       return;
     }
 
-    setState(() => _carregando = true);
-
-    try {
-      final dio = await DioClient.getInstance();
-
-      final response = await dio.post(
-        '/login',
-        data: {'email': email, 'password': senha},
-      );
-
-      if (response.statusCode == 200) {
-
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', response.data['token']);
-
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login realizado com sucesso!')),
-        );
-      }
-    } on DioException catch (e) {
-      if (!mounted) return;
-      String mensagem = e.response?.data['error'] ?? 'Erro no servidor';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(mensagem),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
-      if (mounted) setState(() => _carregando = false);
+    if (senha != confirmacao) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('As senhas não coincidem!')));
+      return;
     }
+
+    setState(() {
+      _carregando = true;
+    });
+
+    await Future.delayed(const Duration(seconds: 3));
+
+    setState(() {
+      _carregando = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Perfil de $_perfilSelecionado cadastrado!')),
+    );
   }
 
   @override
@@ -103,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: 30.0,
+              horizontal: 25.0,
               vertical: 10.0,
             ),
             child: Container(
@@ -120,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   const Center(
                     child: Text(
-                      'Acesse sua conta',
+                      'Crie sua conta',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -129,6 +130,33 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 25),
+
+                  const Text(
+                    'Nome completo:',
+                    style: TextStyle(
+                      color: Color(0xFF333333),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _construirCampoTexto(
+                    controller: _nomeController,
+                    hintText: 'Insira seu nome...',
+                  ),
+                  const SizedBox(height: 15),
+
+                  const Text(
+                    'Selecione seu perfil:',
+                    style: TextStyle(
+                      color: Color(0xFF333333),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _construirCampoSelect(),
+                  const SizedBox(height: 15),
 
                   const Text(
                     'E-mail:',
@@ -160,22 +188,37 @@ class _LoginPageState extends State<LoginPage> {
                     hintText: 'Insira sua senha...',
                     obscureText: true,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
+
+                  const Text(
+                    'Confirme a senha:',
+                    style: TextStyle(
+                      color: Color(0xFF333333),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _construirCampoTexto(
+                    controller: _senhaConfirmacaoController,
+                    hintText: 'Insira sua senha...',
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 25),
 
                   Center(
                     child: GestureDetector(
                       onTap: () {},
                       child: const Text.rich(
                         TextSpan(
-                          text: 'Ainda não possui conta? ',
+                          text: 'Já possui conta? ',
                           style: TextStyle(
                             color: Color(0xFF333333),
                             fontSize: 14,
                           ),
-
                           children: [
                             TextSpan(
-                              text: 'Cadastre-se',
+                              text: 'Faça login',
                               style: TextStyle(
                                 color: Color(0xFF623FBD),
                                 fontWeight: FontWeight.bold,
@@ -206,7 +249,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                               child: const Text(
-                                'Entrar',
+                                'Continuar',
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -219,9 +262,52 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          const SizedBox(height: 150),
+          const SizedBox(height: 50),
           const FooterWidget(),
         ],
+      ),
+    );
+  }
+
+  Widget _construirCampoSelect() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(91, 106, 94, 94),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: _perfilSelecionado,
+          hint: const Text(
+            'Escolha uma opção...',
+            style: TextStyle(color: Colors.black26, fontSize: 15),
+          ),
+          isExpanded: true,
+          icon: const Icon(
+            Icons.arrow_drop_down,
+            color: Color(0xFF623FBD),
+            size: 30,
+          ),
+          style: const TextStyle(color: Colors.black, fontSize: 16),
+          borderRadius: BorderRadius.circular(20),
+          onChanged: (String? novoValor) {
+            setState(() {
+              _perfilSelecionado = novoValor;
+            });
+          },
+          items: _opcoesPerfil.map<DropdownMenuItem<String>>((String valor) {
+            return DropdownMenuItem<String>(value: valor, child: Text(valor));
+          }).toList(),
+        ),
       ),
     );
   }
