@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:sinais_de_inclusao/modules/cadastro/cadastro_page.dart';
 import 'package:sinais_de_inclusao/modules/home/home_page.dart';
+import 'package:sinais_de_inclusao/modules/login/login_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
           seedColor: const Color(0xFFFFB76F),
         ),
       ),
-      home: const CadastroPage(), 
+      home: const LoginPage(), 
     );
   }
 }

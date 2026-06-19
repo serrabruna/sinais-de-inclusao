@@ -27,7 +27,11 @@ class FooterWidget extends StatelessWidget {
 
           Text(
             'Localização',
-            style: TextStyle(color: Color(0xFF7458CF), fontSize: 22),
+            style: TextStyle(
+              color: Color(0xFF7458CF),
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
             textAlign: TextAlign.center,
           ),
 
@@ -43,7 +47,11 @@ class FooterWidget extends StatelessWidget {
 
           Text(
             'Contato',
-            style: TextStyle(color: Color(0xFF7458CF), fontSize: 22),
+            style: TextStyle(
+              color: Color(0xFF7458CF),
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
             textAlign: TextAlign.center,
           ),
 
