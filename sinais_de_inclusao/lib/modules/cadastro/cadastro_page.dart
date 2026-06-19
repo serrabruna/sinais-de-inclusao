@@ -1,4 +1,7 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
 
 class CadastroPage extends StatefulWidget {
@@ -40,46 +43,49 @@ class _CadastroPageState extends State<CadastroPage> {
   }
 
   void _enviarDados() async {
-    String nome = _nomeController.text;
-    String email = _emailController.text;
-    String senha = _senhaController.text;
-    String confirmacao = _senhaConfirmacaoController.text;
+      if (_perfilSelecionado == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Por favor, selecione um perfil!')),
+        );
+        return;
+      }
+      if (_senhaController.text.trim() != _senhaConfirmacaoController.text.trim()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('As senhas não coincidem!')),
+        );
+        return;
+      }
 
-    if (nome.trim().isEmpty ||
-        email.trim().isEmpty ||
-        senha.trim().isEmpty ||
-        confirmacao.trim().isEmpty ||
-        _perfilSelecionado == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Por favor, preencha todos os campos e escolha o perfil!',
-          ),
-        ),
-      );
-      return;
-    }
+      setState(() => _carregando = true);
 
-    if (senha != confirmacao) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('As senhas não coincidem!')));
-      return;
-    }
+      try {
+        final dio = await DioClient.getInstance();
+        
+        final response = await dio.post(
+          'signup',
+          data: {
+            'email': _emailController.text.trim(),
+            'password': _senhaController.text.trim(),
+            'name': _nomeController.text.trim(),
+            'role': _perfilSelecionado!.toLowerCase(),
+          },
+        );
 
-    setState(() {
-      _carregando = true;
-    });
-
-    await Future.delayed(const Duration(seconds: 3));
-
-    setState(() {
-      _carregando = false;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Perfil de $_perfilSelecionado cadastrado!')),
-    );
+        if (response.statusCode == 201) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Conta criada!')));
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context);
+          } else {
+            Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+          }
+        }
+      } on DioException catch (e) {
+        String erro = e.response?.data['error'] ?? 'Erro ao cadastrar';
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(erro), backgroundColor: Colors.red));
+      } finally {
+        if (mounted) setState(() => _carregando = false);
+      }
   }
 
   @override
@@ -209,7 +215,7 @@ class _CadastroPageState extends State<CadastroPage> {
                   Center(
                     child: GestureDetector(
                       onTap: () {},
-                      child: const Text.rich(
+                      child:  Text.rich(
                         TextSpan(
                           text: 'Já possui conta? ',
                           style: TextStyle(
@@ -224,6 +230,8 @@ class _CadastroPageState extends State<CadastroPage> {
                                 fontWeight: FontWeight.bold,
                                 decoration: TextDecoration.underline,
                               ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () => Navigator.pushReplacementNamed(context, '/login'),
                             ),
                           ],
                         ),

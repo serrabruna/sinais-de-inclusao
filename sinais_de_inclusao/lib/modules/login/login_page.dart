@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
@@ -165,7 +166,7 @@ class _LoginPageState extends State<LoginPage> {
                   Center(
                     child: GestureDetector(
                       onTap: () {},
-                      child: const Text.rich(
+                      child: Text.rich(
                         TextSpan(
                           text: 'Ainda não possui conta? ',
                           style: TextStyle(
@@ -181,6 +182,8 @@ class _LoginPageState extends State<LoginPage> {
                                 fontWeight: FontWeight.bold,
                                 decoration: TextDecoration.underline,
                               ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () => Navigator.pushReplacementNamed(context, '/cadastro'),
                             ),
                           ],
                         ),
