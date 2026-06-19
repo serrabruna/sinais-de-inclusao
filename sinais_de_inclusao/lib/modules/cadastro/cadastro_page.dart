@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
+import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
 
 class CadastroPage extends StatefulWidget {
@@ -92,20 +93,7 @@ class _CadastroPageState extends State<CadastroPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF623FBD),
-      appBar: AppBar(
-        toolbarHeight: 100,
-        backgroundColor: const Color(0xFF623FBD),
-        elevation: 0,
-        title: Image.asset('assets/images/logocirculo.png', height: 70),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white, size: 35),
-            onPressed: () {},
-          ),
-          const SizedBox(width: 10),
-        ],
-        automaticallyImplyLeading: false,
-      ),
+      appBar: const CustomAppBar(),
       body: ListView(
         children: [
           Padding(
