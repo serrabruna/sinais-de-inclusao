@@ -1,6 +1,7 @@
 // lib/main.dart
 
 import 'package:flutter/material.dart';
+import 'package:sinais_de_inclusao/modules/categoria/edicao_categoria.dart';
 import 'package:sinais_de_inclusao/modules/categoria/cadastro_categoria.dart';
 import 'package:sinais_de_inclusao/modules/cadastro/cadastro_page.dart';
 import 'package:sinais_de_inclusao/modules/home/home_page.dart';
