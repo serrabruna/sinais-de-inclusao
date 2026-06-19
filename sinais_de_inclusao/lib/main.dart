@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:sinais_de_inclusao/modules/categoria/edicao_categoria.dart';
+import 'package:sinais_de_inclusao/modules/categoria/cadastro_categoria.dart';
+import 'package:sinais_de_inclusao/modules/cadastro/cadastro_page.dart';
 import 'package:sinais_de_inclusao/modules/home/home_page.dart';
 import 'package:sinais_de_inclusao/modules/login/login_page.dart';
 
@@ -22,7 +24,7 @@ class MyApp extends StatelessWidget {
           seedColor: const Color(0xFFFFB76F),
         ),
       ),
-      home: const EdicaoCategoriaPage(), 
+      home: const CadastroCategoriaPage(), 
     );
   }
 }
