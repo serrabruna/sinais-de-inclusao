@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
 
@@ -14,6 +13,11 @@ class _CadastroPageState extends State<CadastroPage> {
   late TextEditingController _emailController;
   late TextEditingController _senhaController;
   late TextEditingController _senhaConfirmacaoController;
+
+  // Variável para armazenar o perfil selecionado
+  String? _perfilSelecionado;
+
+  final List<String> _opcoesPerfil = ['Admin', 'Aluno'];
 
   bool _carregando = false;
 
@@ -44,9 +48,14 @@ class _CadastroPageState extends State<CadastroPage> {
     if (nome.trim().isEmpty ||
         email.trim().isEmpty ||
         senha.trim().isEmpty ||
-        confirmacao.trim().isEmpty) {
+        confirmacao.trim().isEmpty ||
+        _perfilSelecionado == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, preencha todos os campos!')),
+        const SnackBar(
+          content: Text(
+            'Por favor, preencha todos os campos e escolha o perfil!',
+          ),
+        ),
       );
       return;
     }
@@ -68,9 +77,9 @@ class _CadastroPageState extends State<CadastroPage> {
       _carregando = false;
     });
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Conta criada com sucesso!')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Perfil de $_perfilSelecionado cadastrado!')),
+    );
   }
 
   @override
@@ -89,7 +98,7 @@ class _CadastroPageState extends State<CadastroPage> {
           ),
           const SizedBox(width: 10),
         ],
-        automaticallyImplyLeading: false, 
+        automaticallyImplyLeading: false,
       ),
       body: ListView(
         children: [
@@ -104,12 +113,8 @@ class _CadastroPageState extends State<CadastroPage> {
                 vertical: 35.0,
               ),
               decoration: BoxDecoration(
-                color: const Color(
-                  0xFFF3F1FA,
-                ), 
-                borderRadius: BorderRadius.circular(
-                  40,
-                ), 
+                color: const Color(0xFFF3F1FA),
+                borderRadius: BorderRadius.circular(40),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -120,7 +125,7 @@ class _CadastroPageState extends State<CadastroPage> {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF5134A4), 
+                        color: Color(0xFF5134A4),
                       ),
                     ),
                   ),
@@ -137,8 +142,20 @@ class _CadastroPageState extends State<CadastroPage> {
                   const SizedBox(height: 8),
                   _construirCampoTexto(
                     controller: _nomeController,
-                    hintText: 'Insira seu nome...', 
+                    hintText: 'Insira seu nome...',
                   ),
+                  const SizedBox(height: 15),
+
+                  const Text(
+                    'Selecione seu perfil:',
+                    style: TextStyle(
+                      color: Color(0xFF333333),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _construirCampoSelect(),
                   const SizedBox(height: 15),
 
                   const Text(
@@ -153,7 +170,7 @@ class _CadastroPageState extends State<CadastroPage> {
                   _construirCampoTexto(
                     controller: _emailController,
                     hintText: 'Insira seu e-mail...',
-                    keyboardType: TextInputType.emailAddress, 
+                    keyboardType: TextInputType.emailAddress,
                   ),
                   const SizedBox(height: 15),
 
@@ -169,7 +186,7 @@ class _CadastroPageState extends State<CadastroPage> {
                   _construirCampoTexto(
                     controller: _senhaController,
                     hintText: 'Insira sua senha...',
-                    obscureText: true, 
+                    obscureText: true,
                   ),
                   const SizedBox(height: 15),
 
@@ -219,20 +236,16 @@ class _CadastroPageState extends State<CadastroPage> {
                       ? const Center(child: CircularProgressIndicator())
                       : Center(
                           child: SizedBox(
-                            width: 220, 
+                            width: 220,
                             height: 50,
                             child: ElevatedButton(
                               onPressed: _enviarDados,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(
-                                  0xFFFFB46E,
-                                ), 
+                                backgroundColor: const Color(0xFFFFB46E),
                                 foregroundColor: Colors.white,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    25,
-                                  ), 
+                                  borderRadius: BorderRadius.circular(25),
                                 ),
                               ),
                               child: const Text(
@@ -249,11 +262,52 @@ class _CadastroPageState extends State<CadastroPage> {
               ),
             ),
           ),
-          
-          const SizedBox(height: 50), 
-          
+          const SizedBox(height: 50),
           const FooterWidget(),
         ],
+      ),
+    );
+  }
+
+  Widget _construirCampoSelect() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(91, 106, 94, 94),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: _perfilSelecionado,
+          hint: const Text(
+            'Escolha uma opção...',
+            style: TextStyle(color: Colors.black26, fontSize: 15),
+          ),
+          isExpanded: true,
+          icon: const Icon(
+            Icons.arrow_drop_down,
+            color: Color(0xFF623FBD),
+            size: 30,
+          ),
+          style: const TextStyle(color: Colors.black, fontSize: 16),
+          borderRadius: BorderRadius.circular(20),
+          onChanged: (String? novoValor) {
+            setState(() {
+              _perfilSelecionado = novoValor;
+            });
+          },
+          items: _opcoesPerfil.map<DropdownMenuItem<String>>((String valor) {
+            return DropdownMenuItem<String>(value: valor, child: Text(valor));
+          }).toList(),
+        ),
       ),
     );
   }
@@ -267,15 +321,13 @@ class _CadastroPageState extends State<CadastroPage> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(
-          25,
-        ), 
+        borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
             color: const Color.fromARGB(91, 106, 94, 94),
             spreadRadius: 1,
             blurRadius: 3,
-            offset: const Offset(0, 2), 
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -290,10 +342,9 @@ class _CadastroPageState extends State<CadastroPage> {
             horizontal: 20,
             vertical: 15,
           ),
-          border: InputBorder.none, 
+          border: InputBorder.none,
         ),
       ),
     );
   }
 }
-
