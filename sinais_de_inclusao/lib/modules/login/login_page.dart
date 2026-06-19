@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
+import 'package:dio/dio.dart';
+import 'package:sinais_de_inclusao/http/dio_client.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,6 +14,11 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   late TextEditingController _emailController;
   late TextEditingController _senhaController;
+
+  final Dio _dio = Dio(BaseOptions(
+    baseUrl: 'https://sinais-de-inclusao-api.onrender.com',
+    connectTimeout: const Duration(seconds: 5),
+  ));
 
   bool _carregando = false;
 
@@ -28,30 +36,49 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _enviarDados() async {
-    String email = _emailController.text;
-    String senha = _senhaController.text;
+  Future<void> _enviarDados() async {
+    String email = _emailController.text.trim();
+    String senha = _senhaController.text.trim();
 
-    if (email.trim().isEmpty || senha.trim().isEmpty) {
+    if (email.isEmpty || senha.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor, preencha todos os campos!')),
       );
       return;
     }
 
-    setState(() {
-      _carregando = true;
-    });
+    setState(() => _carregando = true);
 
-    await Future.delayed(const Duration(seconds: 3));
+    try {
+      final dio = await DioClient.getInstance();
 
-    setState(() {
-      _carregando = false;
-    });
+      final response = await dio.post(
+        '/login',
+        data: {'email': email, 'password': senha},
+      );
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Conta logada com sucesso!')));
+      if (response.statusCode == 200) {
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', response.data['token']);
+
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login realizado com sucesso!')),
+        );
+      }
+    } on DioException catch (e) {
+      if (!mounted) return;
+      String mensagem = e.response?.data['error'] ?? 'Erro no servidor';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensagem),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _carregando = false);
+    }
   }
 
   @override
