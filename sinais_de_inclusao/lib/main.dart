@@ -6,6 +6,7 @@ import 'package:sinais_de_inclusao/modules/categoria/cadastro_categoria.dart';
 import 'package:sinais_de_inclusao/modules/cadastro/cadastro_page.dart';
 import 'package:sinais_de_inclusao/modules/home/home_page.dart';
 import 'package:sinais_de_inclusao/modules/login/login_page.dart';
+import 'package:sinais_de_inclusao/modules/temas/tema_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,13 +25,14 @@ class MyApp extends StatelessWidget {
           seedColor: const Color(0xFFFFB76F),
         ),
       ),
-      initialRoute: '/home',
+      initialRoute: '/temas',
       routes: {
         '/login': (context) => const LoginPage(),
         '/cadastro': (context) => const CadastroPage(),
         '/home': (context) => const HomePage(),
         '/cadastro-categoria': (context) => const CadastroCategoriaPage(),
         '/edicao-categoria': (context) => const EdicaoCategoriaPage(),
+        '/temas': (context) => const TemasPage(),
       },
     );
   }
