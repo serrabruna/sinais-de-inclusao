@@ -4,6 +4,7 @@ import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
 import 'package:sinais_de_inclusao/widgets/full_width_button.dart';
+import 'package:sinais_de_inclusao/widgets/management_bottom_sheet.dart';
 import 'package:sinais_de_inclusao/widgets/menu_button.dart';
 
 class TemasPage extends StatefulWidget {
@@ -28,6 +29,17 @@ class _TemasPageState extends State<TemasPage> {
     return response.data as List;
   }
 
+  void _mostrarOpcoesGerenciamento(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (context) => const ManagementBottomSheet(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +52,9 @@ class _TemasPageState extends State<TemasPage> {
             return const Center(child: CircularProgressIndicator(color: Colors.white));
           }
           if (snapshot.hasError) {
-            return const Center(child: Text("Erro ao carregar temas", style: TextStyle(color: Colors.white)));
+            return const Center(
+              child: Text("Erro ao carregar temas", style: TextStyle(color: Colors.white)),
+            );
           }
 
           final temas = snapshot.data!;
@@ -52,7 +66,11 @@ class _TemasPageState extends State<TemasPage> {
                 child: Text(
                   "Temas\nQuais sinais você quer aprender hoje?",
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Colors.white, 
+                    fontSize: 20, 
+                    fontWeight: FontWeight.bold
+                  ),
                 ),
               ),
               
@@ -88,7 +106,7 @@ class _TemasPageState extends State<TemasPage> {
                     FullWidthButton(
                       titulo: "Gerenciar Temas", 
                       icone: Icons.settings, 
-                      onPressed: () => print("Gerenciar Temas")
+                      onPressed: () => _mostrarOpcoesGerenciamento(context),
                     ),
                     const SizedBox(height: 15), 
                     FullWidthButton(
