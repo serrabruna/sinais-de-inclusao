@@ -1,77 +1,128 @@
 import 'package:flutter/material.dart';
+import 'package:sinais_de_inclusao/classes/icon_mapper.dart';
+import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
-import 'package:sinais_de_inclusao/widgets/footer_widget.dart'; 
+import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
 import 'package:sinais_de_inclusao/widgets/full_width_button.dart';
+import 'package:sinais_de_inclusao/widgets/management_bottom_sheet.dart';
 import 'package:sinais_de_inclusao/widgets/menu_button.dart';
 
-class TemasPage extends StatelessWidget {
+class TemasPage extends StatefulWidget {
   const TemasPage({super.key});
+
+  @override
+  State<TemasPage> createState() => _TemasPageState();
+}
+
+class _TemasPageState extends State<TemasPage> {
+  late Future<List<dynamic>> _temasFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _temasFuture = _fetchTemas();
+  }
+
+  Future<List<dynamic>> _fetchTemas() async {
+    final dio = await DioClient.getInstance();
+    final response = await dio.get('/categories');
+    return response.data as List;
+  }
+
+  void _mostrarOpcoesGerenciamento(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (context) => const ManagementBottomSheet(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF623FBD),
       appBar: const CustomAppBar(),
-      body: ListView(
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(20.0),
-            child: Text(
-              "Temas\nQuais sinais você quer aprender hoje?",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white, 
-                fontSize: 20, 
-                fontWeight: FontWeight.bold
+      body: FutureBuilder<List<dynamic>>(
+        future: _temasFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: Colors.white));
+          }
+          if (snapshot.hasError) {
+            return const Center(
+              child: Text("Erro ao carregar temas", style: TextStyle(color: Colors.white)),
+            );
+          }
+
+          final temas = snapshot.data!;
+
+          return ListView(
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Text(
+                  "Temas\nQuais sinais você quer aprender hoje?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white, 
+                    fontSize: 20, 
+                    fontWeight: FontWeight.bold
+                  ),
+                ),
               ),
-            ),
-          ),
-          
-          // Grid dos Temas
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: GridView.count(
-              shrinkWrap: true, 
-              physics: const NeverScrollableScrollPhysics(), 
-              crossAxisCount: 2,
-              mainAxisSpacing: 20,
-              crossAxisSpacing: 20,
-              children: [
-                MenuButton(titulo: "Animais", icone: Icons.pets, onPressed: () => print("Animais")),
-                MenuButton(titulo: "Objetos", icone: Icons.menu_book, onPressed: () => print("Objetos")),
-                MenuButton(titulo: "Saudações", icone: Icons.chat, onPressed: () => print("Saudações")),
-                MenuButton(titulo: "Alimentos", icone: Icons.fastfood, onPressed: () => print("Alimentos")),
-                MenuButton(titulo: "Cores", icone: Icons.palette, onPressed: () => print("Cores")),
-                MenuButton(titulo: "Verbos", icone: Icons.directions_run, onPressed: () => print("Verbos")),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 30),
-          
-          // Botões de Gerenciamento
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              children: [
-                FullWidthButton(
-                  titulo: "Gerenciar Temas", 
-                  icone: Icons.settings, 
-                  onPressed: () => print("Gerenciar Temas")
+              
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: temas.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 20,
+                    crossAxisSpacing: 20,
+                  ),
+                  itemBuilder: (context, index) {
+                    final tema = temas[index];
+                    final String nome = tema is Map ? tema['name'] : tema.toString();
+                    
+                    return MenuButton(
+                      titulo: nome,
+                      icone: IconMapper.getIcon(nome),
+                      onPressed: () => print("Navegando para $nome"),
+                    );
+                  },
                 ),
-                const SizedBox(height: 15), 
-                FullWidthButton(
-                  titulo: "Gerenciar Questões", 
-                  icone: Icons.help_outline, 
-                  onPressed: () => print("Gerenciar Questões")
+              ),
+              
+              const SizedBox(height: 30),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  children: [
+                    FullWidthButton(
+                      titulo: "Gerenciar Temas", 
+                      icone: Icons.settings, 
+                      onPressed: () => _mostrarOpcoesGerenciamento(context),
+                    ),
+                    const SizedBox(height: 15), 
+                    FullWidthButton(
+                      titulo: "Gerenciar Questões", 
+                      icone: Icons.help_outline, 
+                      onPressed: () => print("Gerenciar Questões")
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 30), 
-          const FooterWidget(),
-        ],
+              ),
+              
+              const SizedBox(height: 30), 
+              const FooterWidget(),
+            ],
+          );
+        },
       ),
     );
   }
