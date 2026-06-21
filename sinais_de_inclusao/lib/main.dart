@@ -7,6 +7,7 @@ import 'package:sinais_de_inclusao/modules/cadastro/cadastro_page.dart';
 import 'package:sinais_de_inclusao/modules/categoria/excluir_categoria.dart';
 import 'package:sinais_de_inclusao/modules/home/home_page.dart';
 import 'package:sinais_de_inclusao/modules/login/login_page.dart';
+import 'package:sinais_de_inclusao/modules/questoes/edicao_questao.dart';
 import 'package:sinais_de_inclusao/modules/questoes/cadastro_questao.dart';
 import 'package:sinais_de_inclusao/modules/temas/tema_page.dart';
 
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
       //   '/home': (context) => const HomePage(),
       //   '/cadastro-categoria': (context) => const CadastroCategoriaPage(),
       //   '/edicao-categoria': (context) => const EdicaoCategoriaPage(),
+      //   '/edicao-questao': (context) => const EdicaoQuestaoPage(),
       //   '/temas': (context) => const TemasPage(),
       // },
     );
