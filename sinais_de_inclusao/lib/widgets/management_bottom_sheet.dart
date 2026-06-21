@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ManagementBottomSheet extends StatelessWidget {
-  const ManagementBottomSheet({super.key});
+  final VoidCallback onCadastrar;
+  const ManagementBottomSheet({super.key, required this.onCadastrar});
 
   @override
   Widget build(BuildContext context) {
@@ -18,17 +19,14 @@ class ManagementBottomSheet extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.add_circle, color: Color(0xFF623FBD)),
             title: const Text("Criar Categoria"),
-            onTap: () {
-              Navigator.pop(context);
-              
-            },
+            onTap: onCadastrar
           ),
           ListTile(
             leading: const Icon(Icons.edit, color: Colors.orange),
             title: const Text("Editar Categoria"),
             onTap: () {
               Navigator.pop(context);
-              
+              Navigator.pushNamed(context, '/edicao-categoria');
             },
           ),
           ListTile(

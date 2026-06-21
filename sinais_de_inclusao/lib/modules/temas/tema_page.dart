@@ -36,7 +36,15 @@ class _TemasPageState extends State<TemasPage> {
   Future<List<dynamic>> _fetchTemas() async {
     final dio = await DioClient.getInstance();
     final response = await dio.get('/categories');
+
+    print("API Retornou: ${response.data}");
     return response.data as List;
+  }
+
+  void _recarregarTemas() {
+    setState(() {
+      _temasFuture = _fetchTemas();
+    });
   }
 
   void _mostrarOpcoesGerenciamento(BuildContext context) {
@@ -46,7 +54,13 @@ class _TemasPageState extends State<TemasPage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
-      builder: (context) => const ManagementBottomSheet(),
+      builder: (context) => ManagementBottomSheet(
+        onCadastrar: () async {
+          Navigator.pop(context); 
+          await Navigator.pushNamed(context, '/cadastro-categoria');
+          _recarregarTemas();
+        },
+      ),
     );
   }
 
@@ -129,6 +143,7 @@ class _TemasPageState extends State<TemasPage> {
                   ),
                 ),
               ],
+              
               const SizedBox(height: 30), 
               const FooterWidget(),
             ],

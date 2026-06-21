@@ -28,7 +28,6 @@ class MyApp extends StatelessWidget {
           seedColor: const Color(0xFFFFB76F),
         ),
       ),
-      home: ExcluirCategoriaPage(nomeCategoria: 'Animais'),
       initialRoute: '/home',
       routes: {
         '/login': (context) => const LoginPage(),
