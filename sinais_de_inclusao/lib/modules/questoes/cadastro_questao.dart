@@ -3,7 +3,6 @@ import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
 
 class CadastroQuestaoPage extends StatefulWidget {
   const CadastroQuestaoPage({super.key});
-
   @override
   State<CadastroQuestaoPage> createState() => _CadastroQuestaoPageState();
 }
