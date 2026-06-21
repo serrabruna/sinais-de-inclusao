@@ -39,7 +39,7 @@ class _BannerWidgetState extends State<BannerWidget> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      //Direcionar para a página de cadastro
+                      Navigator.pushNamed(context, '/cadastro');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFEDAD6B),
@@ -55,7 +55,7 @@ class _BannerWidgetState extends State<BannerWidget> {
 
                   ElevatedButton(
                     onPressed: () {
-                      //Direcionar para a página de login
+                      Navigator.pushNamed(context, '/login');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFEDAD6B),
