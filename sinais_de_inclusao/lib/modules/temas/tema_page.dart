@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sinais_de_inclusao/classes/icon_mapper.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
@@ -16,11 +17,20 @@ class TemasPage extends StatefulWidget {
 
 class _TemasPageState extends State<TemasPage> {
   late Future<List<dynamic>> _temasFuture;
+  bool _isAdmin = false;
 
   @override
   void initState() {
     super.initState();
     _temasFuture = _fetchTemas();
+    _checkUserRole();
+  }
+
+  Future<void> _checkUserRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isAdmin = prefs.getString('role') == 'admin';
+    });
   }
 
   Future<List<dynamic>> _fetchTemas() async {
@@ -98,26 +108,27 @@ class _TemasPageState extends State<TemasPage> {
                 ),
               ),
               
-              const SizedBox(height: 30),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    FullWidthButton(
-                      titulo: "Gerenciar Temas", 
-                      icone: Icons.settings, 
-                      onPressed: () => _mostrarOpcoesGerenciamento(context),
-                    ),
-                    const SizedBox(height: 15), 
-                    FullWidthButton(
-                      titulo: "Gerenciar Questões", 
-                      icone: Icons.help_outline, 
-                      onPressed: () => print("Gerenciar Questões")
-                    ),
-                  ],
+              if (_isAdmin) ...[
+                const SizedBox(height: 30),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: [
+                      FullWidthButton(
+                        titulo: "Gerenciar Temas", 
+                        icone: Icons.settings, 
+                        onPressed: () => _mostrarOpcoesGerenciamento(context),
+                      ),
+                      const SizedBox(height: 15), 
+                      FullWidthButton(
+                        titulo: "Gerenciar Questões", 
+                        icone: Icons.help_outline, 
+                        onPressed: () => print("Gerenciar Questões")
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              
+              ],
               const SizedBox(height: 30), 
               const FooterWidget(),
             ],
