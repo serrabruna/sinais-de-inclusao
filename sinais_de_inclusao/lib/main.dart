@@ -29,16 +29,16 @@ class MyApp extends StatelessWidget {
         ),
       ),
       home: ExcluirCategoriaPage(nomeCategoria: 'Animais'),
-      // initialRoute: '/temas',
-      // routes: {
-      //   '/login': (context) => const LoginPage(),
-      //   '/cadastro': (context) => const CadastroPage(),
-      //   '/home': (context) => const HomePage(),
-      //   '/cadastro-categoria': (context) => const CadastroCategoriaPage(),
-      //   '/edicao-categoria': (context) => const EdicaoCategoriaPage(),
-      //   '/edicao-questao': (context) => const EdicaoQuestaoPage(),
-      //   '/temas': (context) => const TemasPage(),
-      // },
+      initialRoute: '/home',
+      routes: {
+        '/login': (context) => const LoginPage(),
+        '/cadastro': (context) => const CadastroPage(),
+        '/home': (context) => const HomePage(),
+        '/cadastro-categoria': (context) => const CadastroCategoriaPage(),
+        '/edicao-categoria': (context) => const EdicaoCategoriaPage(),
+        '/edicao-questao': (context) => const EdicaoQuestaoPage(),
+        '/temas': (context) => const TemasPage(),
+      }
     );
   }
 }
