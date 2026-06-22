@@ -1,12 +1,14 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:sinais_de_inclusao/classes/icon_mapper.dart';
+import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
 
 class ExcluirCategoriaPage extends StatefulWidget {
-  final String nomeCategoria;
+  final Map<String, dynamic> categoria;
 
-  const ExcluirCategoriaPage({super.key, required this.nomeCategoria});
+  const ExcluirCategoriaPage({super.key, required this.categoria});
 
   @override
   State<ExcluirCategoriaPage> createState() => _ExcluirCategoriaPageState();
@@ -20,25 +22,28 @@ class _ExcluirCategoriaPageState extends State<ExcluirCategoriaPage> {
   }
 
   void _enviarDados() async {
-    setState(() {
-      _carregando = true;
-    });
+    setState(() => _carregando = true);
 
-    await Future.delayed(const Duration(seconds: 3));
+    try {
+      final dio = await DioClient.getInstance();
+      
+      await dio.delete('/categories/${widget.categoria['id']}');
 
-    setState(() {
-      _carregando = false;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Categoria ${widget.nomeCategoria} excluída com sucesso!',
-        ),
-      ),
-    );
-
-    Navigator.pop(context);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Categoria ${widget.categoria['name']} excluída!'))
+      );
+      
+      Navigator.pop(context, true); 
+      
+    } on DioException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro: ${e.response?.data['error'] ?? 'Falha ao excluir'}'))
+      );
+    } finally {
+      if (mounted) setState(() => _carregando = false);
+    }
   }
 
   @override
@@ -97,13 +102,13 @@ class _ExcluirCategoriaPageState extends State<ExcluirCategoriaPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
-                            IconMapper.getIcon(widget.nomeCategoria),
+                            IconMapper.getIcon(widget.categoria['name']),
                             size: 55,
                             color: const Color(0xFF623FBD),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            widget.nomeCategoria,
+                            widget.categoria['name'],
                             style: const TextStyle(
                               color: Color(0xFF623FBD),
                               fontSize: 18,

@@ -1,9 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
 
 class EdicaoCategoriaPage extends StatefulWidget {
-  const EdicaoCategoriaPage({super.key});
+  final Map<String, dynamic>? categoria;
+  const EdicaoCategoriaPage({super.key, this.categoria});
+  
 
   @override
   State<EdicaoCategoriaPage> createState() => _EdicaoCategoriaPageState();
@@ -19,9 +23,9 @@ class _EdicaoCategoriaPageState extends State<EdicaoCategoriaPage> {
   @override
   void initState() {
     super.initState();
-    _nomeController = TextEditingController();
-    _ordemController = TextEditingController(); 
-    _descricaoController = TextEditingController();
+    _nomeController = TextEditingController(text: widget.categoria!['name']);
+    _ordemController = TextEditingController(text: widget.categoria!['order']?.toString());
+    _descricaoController = TextEditingController(text: widget.categoria!['description']);
   }
 
   @override
@@ -33,44 +37,30 @@ class _EdicaoCategoriaPageState extends State<EdicaoCategoriaPage> {
   }
 
   void _enviarDados() async {
-    String nome = _nomeController.text;
-    String ordemTexto = _ordemController.text; 
-    String descricao = _descricaoController.text;
-
-    if (nome.trim().isEmpty ||
-        ordemTexto.trim().isEmpty ||
-        descricao.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor, preencha todos os campos!'),
-        ),
-      );
+    if (_nomeController.text.trim().isEmpty || _descricaoController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Preencha os campos!')));
       return;
     }
 
-    int? ordemNumero = int.tryParse(ordemTexto);
-    if (ordemNumero == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor, insira um número válido para a ordem!'),
-        ),
-      );
-      return;
+    setState(() => _carregando = true);
+
+    try {
+      final dio = await DioClient.getInstance();
+      
+      await dio.put('/categories/${widget.categoria!['id']}', data: {
+        'name': _nomeController.text.trim(),
+        'description': _descricaoController.text.trim(),
+        'order': int.tryParse(_ordemController.text) ?? 0,
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Categoria atualizada!')));
+      Navigator.pop(context, true);
+    } on DioException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro: ${e.response?.data['error'] ?? 'Falha'}')));
+    } finally {
+      if (mounted) setState(() => _carregando = false);
     }
-
-    setState(() {
-      _carregando = true;
-    });
-
-    await Future.delayed(const Duration(seconds: 3)); 
-
-    setState(() {
-      _carregando = false;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Categoria ${_nomeController.text} alterada com sucesso!')), 
-    );
   }
 
   @override

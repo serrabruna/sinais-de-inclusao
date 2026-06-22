@@ -12,7 +12,9 @@ class DioClient {
       var dir = await getTemporaryDirectory();
       final options = CacheOptions(
         store: HiveCacheStore(dir.path),
-        policy: CachePolicy.forceCache,
+        policy: CachePolicy.request, // Mudança aqui
+        hitCacheOnErrorExcept: [401, 403], 
+        maxStale: const Duration(days: 7), 
       );
 
       _dio = Dio(
