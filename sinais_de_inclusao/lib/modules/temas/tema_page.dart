@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sinais_de_inclusao/classes/icon_mapper.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/modules/categoria/selecao_edicao_page.dart';
+import 'package:sinais_de_inclusao/modules/categoria/selecao_exclusao_page.dart';
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
 import 'package:sinais_de_inclusao/widgets/full_width_button.dart';
@@ -46,7 +47,6 @@ class _TemasPageState extends State<TemasPage> {
     });
   }
 
-  // Agora aceita a lista de temas como parâmetro
   void _mostrarOpcoesGerenciamento(BuildContext context, List<dynamic> temasAtuais) {
     showModalBottomSheet(
       context: context,
@@ -61,6 +61,13 @@ class _TemasPageState extends State<TemasPage> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => SelecaoEdicaoPage(temas: temasAtuais)),
+          ).then((value) => _recarregarTemas());
+        },
+        onExcluir: () {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SelecaoExclusaoPage(temas: temasAtuais)),
           ).then((value) => _recarregarTemas());
         },
       ),

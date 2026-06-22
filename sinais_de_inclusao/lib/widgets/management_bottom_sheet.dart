@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 class ManagementBottomSheet extends StatelessWidget {
   final VoidCallback onCadastrar;
   final VoidCallback onEditar;
-  const ManagementBottomSheet({super.key, required this.onCadastrar, required this.onEditar});
+  final VoidCallback onExcluir;
+  const ManagementBottomSheet({super.key, required this.onCadastrar, required this.onEditar, required this.onExcluir});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +33,7 @@ class ManagementBottomSheet extends StatelessWidget {
             title: const Text("Excluir Categoria"),
             onTap: () {
               Navigator.pop(context);
-              
+              onExcluir();
             },
           ),
         ],
