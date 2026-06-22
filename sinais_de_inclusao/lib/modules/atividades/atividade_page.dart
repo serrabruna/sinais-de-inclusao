@@ -31,13 +31,13 @@ class _AtividadePageState extends State<AtividadePage> {
 
     if (resposta == widget.alternativaCorreta) {
       setState(() {
-        _vidas += 3;
-        if (_vidas > 15) _vidas = 15;
+        _vidas += 10;
+        
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Parabéns! Resposta correta! +3 Vidas 🎉'),
+          content: Text('Parabéns! Resposta correta! +10 XP 🎉'),
           backgroundColor: Colors.green,
         ),
       );
@@ -48,7 +48,7 @@ class _AtividadePageState extends State<AtividadePage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Ops! Resposta errada. 😢'),
+          content: Text('Ops! Resposta errada! -1 XP 😢'),
           backgroundColor: Colors.red,
         ),
       );
