@@ -1,6 +1,7 @@
 // lib/main.dart
 
 import 'package:flutter/material.dart';
+import 'package:sinais_de_inclusao/modules/atividades/atividade_page.dart';
 import 'package:sinais_de_inclusao/modules/categoria/edicao_categoria.dart';
 import 'package:sinais_de_inclusao/modules/categoria/cadastro_categoria.dart';
 import 'package:sinais_de_inclusao/modules/cadastro/cadastro_page.dart';
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
           seedColor: const Color(0xFFFFB76F),
         ),
       ),
-      home: ExcluirCategoriaPage(nomeCategoria: 'Animais'),
+      home: AtividadePage(enunciado: "Qual é o sinal?", urlMidia: "https://i.imgur.com/YfU2j3w.png", alternativas: ["Girafa", "Leão", "Macaco"], alternativaCorreta: "Macaco"),
       // initialRoute: '/temas',
       // routes: {
       //   '/login': (context) => const LoginPage(),
