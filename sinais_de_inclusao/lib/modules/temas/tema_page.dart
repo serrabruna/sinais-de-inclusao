@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sinais_de_inclusao/classes/icon_mapper.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
+import 'package:sinais_de_inclusao/modules/categoria/selecao_edicao_page.dart';
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
 import 'package:sinais_de_inclusao/widgets/full_width_button.dart';
@@ -36,8 +37,6 @@ class _TemasPageState extends State<TemasPage> {
   Future<List<dynamic>> _fetchTemas() async {
     final dio = await DioClient.getInstance();
     final response = await dio.get('/categories');
-
-    print("API Retornou: ${response.data}");
     return response.data as List;
   }
 
@@ -47,18 +46,22 @@ class _TemasPageState extends State<TemasPage> {
     });
   }
 
-  void _mostrarOpcoesGerenciamento(BuildContext context) {
+  // Agora aceita a lista de temas como parâmetro
+  void _mostrarOpcoesGerenciamento(BuildContext context, List<dynamic> temasAtuais) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-      ),
       builder: (context) => ManagementBottomSheet(
         onCadastrar: () async {
-          Navigator.pop(context); 
+          Navigator.pop(context);
           await Navigator.pushNamed(context, '/cadastro-categoria');
           _recarregarTemas();
+        },
+        onEditar: () {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SelecaoEdicaoPage(temas: temasAtuais)),
+          ).then((value) => _recarregarTemas());
         },
       ),
     );
@@ -75,10 +78,8 @@ class _TemasPageState extends State<TemasPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator(color: Colors.white));
           }
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text("Erro ao carregar temas", style: TextStyle(color: Colors.white)),
-            );
+          if (snapshot.hasError || !snapshot.hasData) {
+            return const Center(child: Text("Erro ao carregar temas", style: TextStyle(color: Colors.white)));
           }
 
           final temas = snapshot.data!;
@@ -90,11 +91,7 @@ class _TemasPageState extends State<TemasPage> {
                 child: Text(
                   "Temas\nQuais sinais você quer aprender hoje?",
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white, 
-                    fontSize: 20, 
-                    fontWeight: FontWeight.bold
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
               
@@ -105,14 +102,11 @@ class _TemasPageState extends State<TemasPage> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: temas.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 20,
-                    crossAxisSpacing: 20,
+                    crossAxisCount: 2, mainAxisSpacing: 20, crossAxisSpacing: 20,
                   ),
                   itemBuilder: (context, index) {
                     final tema = temas[index];
                     final String nome = tema is Map ? tema['name'] : tema.toString();
-                    
                     return MenuButton(
                       titulo: nome,
                       icone: IconMapper.getIcon(nome),
@@ -131,7 +125,8 @@ class _TemasPageState extends State<TemasPage> {
                       FullWidthButton(
                         titulo: "Gerenciar Temas", 
                         icone: Icons.settings, 
-                        onPressed: () => _mostrarOpcoesGerenciamento(context),
+                        // Passamos a lista 'temas' aqui
+                        onPressed: () => _mostrarOpcoesGerenciamento(context, temas),
                       ),
                       const SizedBox(height: 15), 
                       FullWidthButton(
@@ -143,7 +138,6 @@ class _TemasPageState extends State<TemasPage> {
                   ),
                 ),
               ],
-              
               const SizedBox(height: 30), 
               const FooterWidget(),
             ],
