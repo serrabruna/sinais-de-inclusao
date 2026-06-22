@@ -32,7 +32,6 @@ class _AtividadePageState extends State<AtividadePage> {
     if (resposta == widget.alternativaCorreta) {
       setState(() {
         _vidas += 10;
-        
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -41,6 +40,12 @@ class _AtividadePageState extends State<AtividadePage> {
           backgroundColor: Colors.green,
         ),
       );
+
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted) {
+          Navigator.pop(context, 10);
+        }
+      });
     } else {
       setState(() {
         if (_vidas > 0) _vidas--;
@@ -48,7 +53,7 @@ class _AtividadePageState extends State<AtividadePage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Ops! Resposta errada! -1 XP 😢'),
+          content: Text('Ops! Resposta errada! -1 Vida 😢'),
           backgroundColor: Colors.red,
         ),
       );
