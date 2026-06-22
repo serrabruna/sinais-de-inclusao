@@ -10,6 +10,7 @@ import 'package:sinais_de_inclusao/modules/login/login_page.dart';
 import 'package:sinais_de_inclusao/modules/questoes/edicao_questao.dart';
 import 'package:sinais_de_inclusao/modules/questoes/cadastro_questao.dart';
 import 'package:sinais_de_inclusao/modules/temas/tema_page.dart';
+import 'package:sinais_de_inclusao/modules/trilha/trilha_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
           seedColor: const Color(0xFFFFB76F),
         ),
       ),
-      home: ExcluirCategoriaPage(nomeCategoria: 'Animais'),
+      home: TrilhaPage(),
       // initialRoute: '/temas',
       // routes: {
       //   '/login': (context) => const LoginPage(),
