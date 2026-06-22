@@ -19,7 +19,7 @@ class AtividadePage extends StatefulWidget {
 }
 
 class _AtividadePageState extends State<AtividadePage> {
-  int _vidas = 0;
+  int _vidas = 5;
   String? _alternativaSelecionada;
 
   void _verificarResposta(String resposta) {
