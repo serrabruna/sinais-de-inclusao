@@ -39,11 +39,9 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomePage(),
         '/cadastro-categoria': (context) => const CadastroCategoriaPage(),
         '/edicao-categoria': (context) => const EdicaoCategoriaPage(),
-        '/edicao-questao': (context) => const EdicaoQuestaoPage(),
         '/temas': (context) => const TemasPage(),
         '/listagem_questoes': (context) => const ListagemQuestoesPage(),
         '/cadastro-questao': (context) => const CadastroQuestaoPage(),
-        '/excluir-questao': (context) => const ExcluirQuestaoPage(nomeQuestao: ''), // Ajuste conforme necessário
         
       }
     );

@@ -1,11 +1,14 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:sinais_de_inclusao/http/dio_client.dart';
+import 'package:sinais_de_inclusao/model/sign_model.dart';
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
 
 class ExcluirQuestaoPage extends StatefulWidget {
-  final String nomeQuestao;
+  final SignModel questao;
 
-  const ExcluirQuestaoPage({super.key, required this.nomeQuestao});
+  const ExcluirQuestaoPage({super.key, required this.questao});
 
   @override
   State<ExcluirQuestaoPage> createState() => _ExcluirQuestaoPageState();
@@ -14,30 +17,29 @@ class ExcluirQuestaoPage extends StatefulWidget {
 class _ExcluirQuestaoPageState extends State<ExcluirQuestaoPage> {
   bool _carregando = false;
 
-  void _voltar() {
-    Navigator.pop(context); 
-  }
+  void _voltar() => Navigator.pop(context);
 
-  void _enviarDados() async {
-    setState(() {
-      _carregando = true; 
-    });
+  Future<void> _enviarDados() async {
+    setState(() => _carregando = true);
 
-    await Future.delayed(const Duration(seconds: 3));
+    try {
+      final dio = await DioClient.getInstance();
+      await dio.delete('/signs/${widget.questao.id}');
 
-    setState(() {
-      _carregando = false;
-    });
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Atividade "${widget.questao.name}" excluída!')),
+      );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Atividade ${widget.nomeQuestao} excluída com sucesso!',
-        ),
-      ),
-    );
-
-    Navigator.pop(context); 
+      Navigator.pop(context, true); 
+    } on DioException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao excluir: ${e.response?.data['message'] ?? 'Falha'}')),
+      );
+    } finally {
+      if (mounted) setState(() => _carregando = false);
+    }
   }
 
   @override
@@ -45,23 +47,21 @@ class _ExcluirQuestaoPageState extends State<ExcluirQuestaoPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF623FBD),
       appBar: const CustomAppBar(),
-      body: ListView(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 25.0,
-              vertical: 10.0,
-            ),
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 25.0,
-                vertical: 35.0,
-              ),
+      
+      body: Center(
+        child: ListView(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 25.0),
+          children: [
+            Container(
+              padding: const EdgeInsets.all(25.0),
               decoration: BoxDecoration(
                 color: const Color(0xFFF3F1FA),
                 borderRadius: BorderRadius.circular(40),
               ),
               child: Column(
+                mainAxisSize: MainAxisSize.min, 
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Center(
@@ -75,103 +75,53 @@ class _ExcluirQuestaoPageState extends State<ExcluirQuestaoPage> {
                     ),
                   ),
                   const SizedBox(height: 25),
-
-                  Center(
-                    child: Text(
-                      'Tem certeza de que deseja excluir a atividade "${widget.nomeQuestao}"?', 
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.black,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                  Text(
+                    'Tem certeza de que deseja excluir a atividade "${widget.questao.name}"?',
+                    style: const TextStyle(fontSize: 20, color: Colors.black),
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 25),
-
                   const Center(
-                    child: Text(
-                      'ATENÇÃO:',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
-                    ),
+                    child: Text('ATENÇÃO:',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red)),
                   ),
                   const Center(
-                    child: Text(
-                      'Esta ação não pode ser desfeita',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.black54,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    child: Text('Esta ação não pode ser desfeita',
+                        style: TextStyle(fontSize: 16, color: Colors.black54)),
                   ),
                   const SizedBox(height: 35),
-
                   _carregando
                       ? const Center(child: CircularProgressIndicator())
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SizedBox(
-                              width: 130,
-                              height: 50,
-                              child: ElevatedButton(
-                                onPressed: _voltar,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFFFB46E),
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(25),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Voltar',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
+                            _botaoAcao('Voltar', const Color(0xFFFFB46E), _voltar),
                             const SizedBox(width: 15),
-
-                            SizedBox(
-                              width: 130,
-                              height: 50,
-                              child: ElevatedButton(
-                                onPressed: _enviarDados,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFFF5A4A),
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(25),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Excluir',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
+                            _botaoAcao('Excluir', const Color(0xFFFF5A4A), _enviarDados),
                           ],
                         ),
                 ],
               ),
             ),
-          ),
-          const SizedBox(height: 200),
-          const FooterWidget(),
-        ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _botaoAcao(String texto, Color cor, VoidCallback onPressed) {
+    return SizedBox(
+      width: 130,
+      height: 50,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: cor,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+        ),
+        child: Text(texto, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
       ),
     );
   }
