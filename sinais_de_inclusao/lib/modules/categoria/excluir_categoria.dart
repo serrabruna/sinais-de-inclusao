@@ -214,8 +214,6 @@ class _ExcluirCategoriaPageState extends State<ExcluirCategoriaPage> {
               ),
             ),
           ),
-          const SizedBox(height: 50),
-          const FooterWidget(),
         ],
       ),
     );
