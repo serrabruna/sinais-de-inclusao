@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
 
@@ -33,17 +35,13 @@ class _CadastroCategoriaPageState extends State<CadastroCategoriaPage> {
   }
 
   void _enviarDados() async {
-    String nome = _nomeController.text;
-    String ordemTexto = _ordemController.text; 
-    String descricao = _descricaoController.text;
+    String nome = _nomeController.text.trim();
+    String ordemTexto = _ordemController.text.trim();
+    String descricao = _descricaoController.text.trim();
 
-    if (nome.trim().isEmpty ||
-        ordemTexto.trim().isEmpty ||
-        descricao.trim().isEmpty) {
+    if (nome.isEmpty || ordemTexto.isEmpty || descricao.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor, preencha todos os campos!'),
-        ),
+        const SnackBar(content: Text('Por favor, preencha todos os campos!')),
       );
       return;
     }
@@ -51,26 +49,42 @@ class _CadastroCategoriaPageState extends State<CadastroCategoriaPage> {
     int? ordemNumero = int.tryParse(ordemTexto);
     if (ordemNumero == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor, insira um número válido para a ordem!'),
-        ),
+        const SnackBar(content: Text('Por favor, insira um número válido para a ordem!')),
       );
       return;
     }
 
-    setState(() {
-      _carregando = true;
-    });
+    setState(() => _carregando = true);
 
-    await Future.delayed(const Duration(seconds: 3)); 
+    try {
+      final dio = await DioClient.getInstance();
+      
+      await dio.post('/categories', data: {
+        'name': nome,
+        'description': descricao,
+      });
 
-    setState(() {
-      _carregando = false;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Categoria ${_nomeController.text} cadastrada com sucesso!')), 
-    );
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Categoria "$nome" cadastrada com sucesso!')),
+      );
+      
+      _nomeController.clear();
+      _ordemController.clear();
+      _descricaoController.clear();
+      
+    } on DioException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao cadastrar: ${e.response?.data['error'] ?? 'Erro de conexão'}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _carregando = false);
+    }
   }
 
   @override
