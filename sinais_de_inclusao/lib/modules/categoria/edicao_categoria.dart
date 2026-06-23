@@ -155,8 +155,6 @@ class _EdicaoCategoriaPageState extends State<EdicaoCategoriaPage> {
               ),
             ),
           ),
-          const SizedBox(height: 50),
-          const FooterWidget(),
         ],
       ),
     );

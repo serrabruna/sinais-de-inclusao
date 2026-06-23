@@ -179,8 +179,6 @@ class _CadastroCategoriaPageState extends State<CadastroCategoriaPage> {
               ),
             ),
           ),
-          const SizedBox(height: 50),
-          const FooterWidget(),
         ],
       ),
     );

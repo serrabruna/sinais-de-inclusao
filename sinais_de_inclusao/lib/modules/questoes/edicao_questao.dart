@@ -1,43 +1,48 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:sinais_de_inclusao/http/dio_client.dart';
+import 'package:sinais_de_inclusao/model/sign_model.dart';
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
 
 class EdicaoQuestaoPage extends StatefulWidget {
-  const EdicaoQuestaoPage({super.key});
+  final SignModel questao;
+  const EdicaoQuestaoPage({super.key, required this.questao});
+  
   @override
   State<EdicaoQuestaoPage> createState() => _EdicaoQuestaoPageState();
 }
 
 class _EdicaoQuestaoPageState extends State<EdicaoQuestaoPage> {
-  late TextEditingController _nomeController;
-  late TextEditingController _enunciadoController;
-  late TextEditingController _urlController;
-  late TextEditingController _alternativa1Controller;
-  late TextEditingController _alternativa2Controller;
-  late TextEditingController _alternativa3Controller;
-  late TextEditingController _alternativaCorretaController;
-  String? _categoriaSelecionada;
-
-  final List<String> _opcoesPerfil = [
-    'Animais',
-    'Objetos',
-    'Saudações',
-    'Alimentos',
-    'Cores',
-    'Verbos',
-  ];
+  final _nomeController = TextEditingController();
+  final _enunciadoController = TextEditingController();
+  final _urlController = TextEditingController();
+  final _altCorretaController = TextEditingController();
+  final _alt1Controller = TextEditingController();
+  final _alt2Controller = TextEditingController();
+  final _alt3Controller = TextEditingController();
+  final _alt4Controller = TextEditingController(); 
+  
+  int? _idCategoriaSelecionada;
+  List<Map<String, dynamic>> _listaCategorias = [];
   bool _carregando = false;
 
   @override
   void initState() {
     super.initState();
-    _nomeController = TextEditingController();
-    _enunciadoController = TextEditingController();
-    _urlController = TextEditingController();
-    _alternativaCorretaController = TextEditingController();
-    _alternativa1Controller = TextEditingController();
-    _alternativa2Controller = TextEditingController();
-    _alternativa3Controller = TextEditingController();
+    _nomeController.text = widget.questao.name;
+    _enunciadoController.text = widget.questao.statement;
+    _urlController.text = widget.questao.imagePath;
+    _altCorretaController.text = widget.questao.correctAnswer;
+    _idCategoriaSelecionada = widget.questao.categoryId;
+
+    if (widget.questao.options.length >= 5) { 
+      _alt1Controller.text = widget.questao.options[1];
+      _alt2Controller.text = widget.questao.options[2];
+      _alt3Controller.text = widget.questao.options[3];
+      _alt4Controller.text = widget.questao.options[4]; 
+    }
+    _buscarCategorias();
   }
 
   @override
@@ -45,53 +50,60 @@ class _EdicaoQuestaoPageState extends State<EdicaoQuestaoPage> {
     _nomeController.dispose();
     _enunciadoController.dispose();
     _urlController.dispose();
-    _alternativa1Controller.dispose();
-    _alternativa2Controller.dispose();
-    _alternativa3Controller.dispose();
-    _alternativaCorretaController.dispose();
+    _altCorretaController.dispose();
+    _alt1Controller.dispose();
+    _alt2Controller.dispose();
+    _alt3Controller.dispose();
+    _alt4Controller.dispose(); 
     super.dispose();
   }
 
-  void _enviarDados() async {
-    String nome = _nomeController.text;
-    String enunciado = _enunciadoController.text;
-    String url = _urlController.text;
-    String alternativaCorreta = _alternativaCorretaController.text;
-    String alternativa1 = _alternativa1Controller.text;
-    String alternativa2 = _alternativa2Controller.text;
-    String alternativa3 = _alternativa3Controller.text;
+  Future<void> _buscarCategorias() async {
+    try {
+      final dio = await DioClient.getInstance();
+      final response = await dio.get('/categories');
+      setState(() {
+        _listaCategorias = List<Map<String, dynamic>>.from(response.data);
+        bool existe = _listaCategorias.any((cat) => cat['id'] == widget.questao.categoryId);
+        _idCategoriaSelecionada = existe ? widget.questao.categoryId : null;
+      });
+    } catch (e) {
+      debugPrint("Erro ao carregar categorias: $e");
+    }
+  }
 
-    if (nome.trim().isEmpty ||
-        enunciado.trim().isEmpty ||
-        url.trim().isEmpty ||
-        alternativaCorreta.trim().isEmpty ||
-        alternativa1.trim().isEmpty ||
-        alternativa2.trim().isEmpty ||
-        alternativa3.trim().isEmpty ||
-        _categoriaSelecionada == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Por favor, preencha todos os campos e escolha a categoria!',
-          ),
-        ),
-      );
+  Future<void> _enviarDados() async {
+    if (_idCategoriaSelecionada == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Selecione uma categoria válida!')));
       return;
     }
 
-    setState(() {
-      _carregando = true;
-    });
+    setState(() => _carregando = true);
 
-    await Future.delayed(const Duration(seconds: 3));
+    try {
+      final dio = await DioClient.getInstance();
+      await dio.put('/signs/${widget.questao.id}', data: {
+        'categoryId': _idCategoriaSelecionada,
+        'name': _nomeController.text.trim(),
+        'statement': _enunciadoController.text.trim(),
+        'imagePath': _urlController.text.trim(),
+        'correctAnswer': _altCorretaController.text.trim(),
+        'options': [
+          _altCorretaController.text.trim(),
+          _alt1Controller.text.trim(),
+          _alt2Controller.text.trim(),
+          _alt3Controller.text.trim(),
+          _alt4Controller.text.trim(), 
+        ],
+      });
 
-    setState(() {
-      _carregando = false;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Atividade ${_nomeController.text} cadastrada!')),
-    );
+      if (!mounted) return;
+      Navigator.pop(context, true);
+    } on DioException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro: ${e.response?.data.toString()}')));
+    } finally {
+      if (mounted) setState(() => _carregando = false);
+    }
   }
 
   @override
@@ -101,264 +113,70 @@ class _EdicaoQuestaoPageState extends State<EdicaoQuestaoPage> {
       body: ListView(
         children: [
           const CustomAppBar(),
-
           Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 25.0,
-              vertical: 10.0,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 25.0,
-                vertical: 35.0,
-              ),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF3F1FA),
-                borderRadius: BorderRadius.circular(40),
-              ),
+              padding: const EdgeInsets.all(25.0),
+              decoration: BoxDecoration(color: const Color(0xFFF3F1FA), borderRadius: BorderRadius.circular(40)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Center(
-                    child: Text(
-                      'Editar Atividade',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF5134A4),
-                      ),
-                    ),
+                  const Center(child: Text('Editar Atividade', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF5134A4)))),
+                  const SizedBox(height: 20),
+                  
+                  DropdownButtonFormField<int>(
+                    value: _idCategoriaSelecionada,
+                    decoration: InputDecoration(labelText: "Categoria", border: OutlineInputBorder(borderRadius: BorderRadius.circular(25))),
+                    items: _listaCategorias.map((cat) => DropdownMenuItem<int>(
+                      value: cat['id'] as int,
+                      child: Text(cat['name']),
+                    )).toList(),
+                    onChanged: (val) => setState(() => _idCategoriaSelecionada = val),
                   ),
+                  
+                  _construirCampoTexto(controller: _nomeController, hintText: 'Nome da Questão'),
+                  _construirCampoTexto(controller: _enunciadoController, hintText: 'Enunciado'),
+                  _construirCampoTexto(controller: _urlController, hintText: 'URL da Imagem'),
+                  _construirCampoTexto(controller: _altCorretaController, hintText: 'Alternativa Correta'),
+                  _construirCampoTexto(controller: _alt1Controller, hintText: 'Alternativa 1'),
+                  _construirCampoTexto(controller: _alt2Controller, hintText: 'Alternativa 2'),
+                  _construirCampoTexto(controller: _alt3Controller, hintText: 'Alternativa 3'),
+                  _construirCampoTexto(controller: _alt4Controller, hintText: 'Alternativa 4'), 
+                  
                   const SizedBox(height: 25),
-
-                  const Text(
-                    'Selecione a Categoria:',
-                    style: TextStyle(
-                      color: Color(0xFF333333),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _construirCampoSelect(),
-                  const SizedBox(height: 15),
-
-                  const Text(
-                    'Nome da Categoria:',
-                    style: TextStyle(
-                      color: Color(0xFF333333),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _construirCampoTexto(
-                    controller: _nomeController,
-                    hintText: 'Ex: Animais',
-                  ),
-                  const SizedBox(height: 15),
-
-                  const Text(
-                    'Enunciado:',
-                    style: TextStyle(
-                      color: Color(0xFF333333),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _construirCampoTexto(
-                    controller: _enunciadoController,
-                    hintText: 'Insira o enunciado...',
-                  ),
-                  const SizedBox(height: 15),
-
-                  const Text(
-                    'URL da mídia:',
-                    style: TextStyle(
-                      color: Color(0xFF333333),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _construirCampoTexto(
-                    controller: _urlController,
-                    hintText: 'Insira a URL...',
-                  ),
-                  const SizedBox(height: 15),
-
-                  const Text(
-                    'Alternativa correta:',
-                    style: TextStyle(
-                      color: Color(0xFF333333),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _construirCampoTexto(
-                    controller: _alternativaCorretaController,
-                    hintText: 'Insira a alternativa correta...',
-                  ),
-                  const SizedBox(height: 15),
-
-                  const Text(
-                    'Alternativa 1:',
-                    style: TextStyle(
-                      color: Color(0xFF333333),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _construirCampoTexto(
-                    controller: _alternativa1Controller,
-                    hintText: 'Insira a primeira alternativa...',
-                  ),
-                  const SizedBox(height: 15),
-
-                  const Text(
-                    'Alternativa 2:',
-                    style: TextStyle(
-                      color: Color(0xFF333333),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _construirCampoTexto(
-                    controller: _alternativa2Controller,
-                    hintText: 'Insira a segunda alternativa...',
-                  ),
-                  const SizedBox(height: 15),
-
-                  const Text(
-                    'Alternativa 3:',
-                    style: TextStyle(
-                      color: Color(0xFF333333),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _construirCampoTexto(
-                    controller: _alternativa3Controller,
-                    hintText: 'Insira a terceira alternativa...',
-                  ),
-                  const SizedBox(height: 25),
-
-                  _carregando
-                      ? const Center(child: CircularProgressIndicator())
-                      : Center(
-                          child: SizedBox(
-                            width: 220,
-                            height: 50,
-                            child: ElevatedButton(
-                              onPressed: _enviarDados,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFFB46E),
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                              ),
-                              child: const Text(
-                                'Continuar',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
+                  _carregando ? const Center(child: CircularProgressIndicator()) 
+                    : Center(
+                        child: SizedBox(
+                          width: 220, height: 50,
+                          child: ElevatedButton(
+                            onPressed: _enviarDados,
+                            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFB46E), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25))),
+                            child: const Text('Salvar Alterações', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                           ),
                         ),
+                      ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 50),
-          const FooterWidget(),
+
         ],
       ),
     );
   }
 
-  Widget _construirCampoSelect() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(25),
-        boxShadow: [
-          BoxShadow(
-            color: const Color.fromARGB(91, 106, 94, 94),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: _categoriaSelecionada,
-          hint: const Text(
-            'Escolha uma opção...',
-            style: TextStyle(color: Colors.black26, fontSize: 15),
-          ),
-          isExpanded: true,
-          icon: const Icon(
-            Icons.arrow_drop_down,
-            color: Color(0xFF623FBD),
-            size: 30,
-          ),
-          style: const TextStyle(color: Colors.black, fontSize: 16),
-          borderRadius: BorderRadius.circular(20),
-          onChanged: (String? novoValor) {
-            setState(() {
-              _categoriaSelecionada = novoValor;
-            });
-          },
-          items: _opcoesPerfil.map<DropdownMenuItem<String>>((String valor) {
-            return DropdownMenuItem<String>(value: valor, child: Text(valor));
-          }).toList(),
+  Widget _construirCampoTexto({required TextEditingController controller, required String hintText}) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white, 
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0, 2))],
         ),
-      ),
-    );
-  }
-
-  Widget _construirCampoTexto({
-    required TextEditingController controller,
-    required String hintText,
-    bool obscureText = false,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(25),
-        boxShadow: [
-          BoxShadow(
-            color: const Color.fromARGB(91, 106, 94, 94),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: TextField(
-        controller: controller,
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: const TextStyle(color: Colors.black26, fontSize: 15),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 15,
-          ),
-          border: InputBorder.none,
+        child: TextField(
+          controller: controller,
+          decoration: InputDecoration(hintText: hintText, contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15), border: InputBorder.none),
         ),
       ),
     );

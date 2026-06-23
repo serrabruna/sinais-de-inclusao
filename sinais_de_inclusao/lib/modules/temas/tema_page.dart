@@ -41,6 +41,7 @@ class _TemasPageState extends State<TemasPage> {
     return response.data as List;
   }
 
+  
   void _recarregarTemas() {
     setState(() {
       _temasFuture = _fetchTemas();
@@ -53,6 +54,7 @@ class _TemasPageState extends State<TemasPage> {
       builder: (context) => ManagementBottomSheet(
         onCadastrar: () async {
           Navigator.pop(context);
+          
           await Navigator.pushNamed(context, '/cadastro-categoria');
           _recarregarTemas();
         },
@@ -61,14 +63,14 @@ class _TemasPageState extends State<TemasPage> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => SelecaoEdicaoPage(temas: temasAtuais)),
-          ).then((value) => _recarregarTemas());
+          ).then((_) => _recarregarTemas()); 
         },
         onExcluir: () {
           Navigator.pop(context);
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => SelecaoExclusaoPage(temas: temasAtuais)),
-          ).then((value) => _recarregarTemas());
+          ).then((_) => _recarregarTemas()); 
         },
       ),
     );
@@ -138,7 +140,8 @@ class _TemasPageState extends State<TemasPage> {
                       FullWidthButton(
                         titulo: "Gerenciar Questões", 
                         icone: Icons.help_outline, 
-                        onPressed: () => Navigator.pushNamed(context, '/listagem_questoes'),
+                        onPressed: () => Navigator.pushNamed(context, '/listagem_questoes')
+                            .then((_) => _recarregarTemas()), 
                       ),
                     ],
                   ),

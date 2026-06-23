@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/model/sign_model.dart';
+import 'package:sinais_de_inclusao/modules/questoes/edicao_questao.dart';
+import 'package:sinais_de_inclusao/modules/questoes/excluir_questao.dart';
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
 
 class ListagemQuestoesPage extends StatefulWidget {
@@ -29,7 +31,7 @@ class _ListagemQuestoesPageState extends State<ListagemQuestoesPage> {
   Future<List<SignModel>> _fetchQuestoes() async {
     try {
       final dio = await DioClient.getInstance();
-      // Rota corrigida para /signs conforme sua indicação
+      
       final response = await dio.get('/signs'); 
 
       print("DEBUG - Dados da resposta: ${response.data}");
@@ -47,37 +49,52 @@ class _ListagemQuestoesPageState extends State<ListagemQuestoesPage> {
     }
   }
   void _abrirMenuQuestao(SignModel questao) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text("Questão: ${questao.name}", 
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.edit, color: Colors.blue),
-              title: const Text("Editar Questão"),
-              onTap: () {
-                Navigator.pop(context);
-                // navegação de edição
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text("Excluir Questão"),
-              onTap: () {
-                Navigator.pop(context);
-                // navegação de exclusão 
-              },
-            ),
-          ],
-        ),
+  showModalBottomSheet(
+    context: context,
+    builder: (context) => Container(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("Questão: ${questao.name}", 
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.edit, color: Colors.blue),
+            title: const Text("Editar Questão"),
+            onTap: () {
+              Navigator.pop(context); 
+              
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EdicaoQuestaoPage(questao: questao),
+                ),
+              ).then((deveRecarregar) {
+                if (deveRecarregar == true) _recarregarQuestoes();
+              });
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.delete, color: Colors.red),
+            title: const Text("Excluir Questão"),
+            onTap: () {
+              Navigator.pop(context); 
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ExcluirQuestaoPage(questao: questao),
+                ),
+              ).then((deveRecarregar) {
+                if (deveRecarregar == true) _recarregarQuestoes();
+              });
+            },
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
