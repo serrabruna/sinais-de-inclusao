@@ -132,14 +132,13 @@ class _TemasPageState extends State<TemasPage> {
                       FullWidthButton(
                         titulo: "Gerenciar Temas", 
                         icone: Icons.settings, 
-                        // Passamos a lista 'temas' aqui
                         onPressed: () => _mostrarOpcoesGerenciamento(context, temas),
                       ),
                       const SizedBox(height: 15), 
                       FullWidthButton(
                         titulo: "Gerenciar Questões", 
                         icone: Icons.help_outline, 
-                        onPressed: () => print("Gerenciar Questões")
+                        onPressed: () => Navigator.pushNamed(context, '/listagem_questoes'),
                       ),
                     ],
                   ),
