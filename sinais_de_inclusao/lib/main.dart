@@ -44,8 +44,7 @@ class MyApp extends StatelessWidget {
         '/listagem_questoes': (context) => const ListagemQuestoesPage(),
         '/cadastro-questao': (context) => const CadastroQuestaoPage(),
         '/trilha': (context) => const TrilhaPage()
-        
-      // }
+      }
     );
   }
 }

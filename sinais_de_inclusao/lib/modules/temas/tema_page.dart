@@ -4,6 +4,7 @@ import 'package:sinais_de_inclusao/classes/icon_mapper.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/modules/categoria/selecao_edicao_page.dart';
 import 'package:sinais_de_inclusao/modules/categoria/selecao_exclusao_page.dart';
+import 'package:sinais_de_inclusao/modules/sinais/sinais_page.dart'; // Importe sua SinaisPage
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
 import 'package:sinais_de_inclusao/widgets/full_width_button.dart';
@@ -113,15 +114,27 @@ class _TemasPageState extends State<TemasPage> {
                   itemBuilder: (context, index) {
                     final tema = temas[index];
                     final String nome = tema is Map ? tema['name'] : tema.toString();
+                    final int id = tema is Map ? tema['id'] : index;
+
                     return MenuButton(
                       titulo: nome,
                       icone: IconMapper.getIcon(nome),
-                      onPressed: () => print("Navegando para $nome"),
+                      onPressed: () {
+                        // Navegação para a página de sinais
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SinaisPage(
+                              idCategoria: id,
+                              nomeTema: nome,
+                            ),
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
               ),
-
 
               if (!_isAdmin) ...[
                 const SizedBox(height: 30),
@@ -134,7 +147,6 @@ class _TemasPageState extends State<TemasPage> {
                   ),
                 ),
               ],
-
               
               if (_isAdmin) ...[
                 const SizedBox(height: 30),
