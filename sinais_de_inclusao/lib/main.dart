@@ -12,6 +12,7 @@ import 'package:sinais_de_inclusao/modules/login/login_page.dart';
 import 'package:sinais_de_inclusao/modules/questoes/edicao_questao.dart';
 import 'package:sinais_de_inclusao/modules/questoes/cadastro_questao.dart';
 import 'package:sinais_de_inclusao/modules/questoes/excluir_questao.dart';
+import 'package:sinais_de_inclusao/modules/sinais/sinais_page.dart';
 import 'package:sinais_de_inclusao/modules/temas/tema_page.dart';
 import 'package:sinais_de_inclusao/modules/trilha/trilha_page.dart';
 
@@ -32,18 +33,19 @@ class MyApp extends StatelessWidget {
           seedColor: const Color(0xFFFFB76F),
         ),
       ),
-      initialRoute: '/home',
-      routes: {
-        '/login': (context) => const LoginPage(),
-        '/cadastro': (context) => const CadastroPage(),
-        '/home': (context) => const HomePage(),
-        '/cadastro-categoria': (context) => const CadastroCategoriaPage(),
-        '/edicao-categoria': (context) => const EdicaoCategoriaPage(),
-        '/temas': (context) => const TemasPage(),
-        '/listagem_questoes': (context) => const ListagemQuestoesPage(),
-        '/cadastro-questao': (context) => const CadastroQuestaoPage(),
+      home: SinaisPage(nomeTema: "Animais",),
+      // initialRoute: '/home',
+      // routes: {
+      //   '/login': (context) => const LoginPage(),
+      //   '/cadastro': (context) => const CadastroPage(),
+      //   '/home': (context) => const HomePage(),
+      //   '/cadastro-categoria': (context) => const CadastroCategoriaPage(),
+      //   '/edicao-categoria': (context) => const EdicaoCategoriaPage(),
+      //   '/temas': (context) => const TemasPage(),
+      //   '/listagem_questoes': (context) => const ListagemQuestoesPage(),
+      //   '/cadastro-questao': (context) => const CadastroQuestaoPage(),
         
-      }
+      // }
     );
   }
 }
