@@ -24,12 +24,25 @@ class AtividadePage extends StatefulWidget {
 }
 
 class _AtividadePageState extends State<AtividadePage> {
-  bool? _foiCorreto; 
+  bool? _foiCorreto;
   String? _alternativaSelecionada;
   bool _enviando = false;
 
+  // ESTA É A CHAVE PARA O PROBLEMA DE ESTADO AO MUDAR DE ATIVIDADE
+  @override
+  void didUpdateWidget(covariant AtividadePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.idQuestao != widget.idQuestao) {
+      setState(() {
+        _alternativaSelecionada = null;
+        _foiCorreto = null;
+        _enviando = false;
+      });
+    }
+  }
+
   Future<void> _verificarResposta(String resposta) async {
-    if (_enviando) return; 
+    if (_enviando || _alternativaSelecionada != null) return;
 
     setState(() {
       _alternativaSelecionada = resposta;
@@ -51,31 +64,39 @@ class _AtividadePageState extends State<AtividadePage> {
       });
 
       if (acertou) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Correto! +10 XP'), backgroundColor: Colors.green));
-        Future.delayed(const Duration(seconds: 1), () => widget.onFinalizado(10));
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Correto! +10 XP'), backgroundColor: Colors.green)
+        );
+        Future.delayed(const Duration(seconds: 1), () {
+          if (mounted) widget.onFinalizado(10);
+        });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tente novamente!'), backgroundColor: Colors.red));
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Resposta errada, tente novamente!'), backgroundColor: Colors.red)
+        );
         
-        
+        // Reset para permitir nova tentativa
         Future.delayed(const Duration(seconds: 1), () {
           if (mounted) {
             setState(() {
-              _alternativaSelecionada = null; 
+              _alternativaSelecionada = null;
               _foiCorreto = null;
             });
           }
         });
       }
     } catch (e) {
-      setState(() => _enviando = false);
+      if (mounted) setState(() => _enviando = false);
+      debugPrint("Erro na API: $e");
     }
   }
 
   Color _obterCorBotao(String alternativa) {
     if (_alternativaSelecionada == null) return Colors.white;
     if (_alternativaSelecionada == alternativa) {
-      
-      if (_enviando) return Colors.white70; 
+      if (_enviando) return Colors.white70;
       return (_foiCorreto == true) ? Colors.green : Colors.red;
     }
     return const Color.fromARGB(184, 161, 160, 160);
@@ -97,7 +118,6 @@ class _AtividadePageState extends State<AtividadePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -119,7 +139,6 @@ class _AtividadePageState extends State<AtividadePage> {
                 ],
               ),
               const SizedBox(height: 30),
-              
               Center(
                 child: Container(
                   width: 250, height: 250,
@@ -134,7 +153,6 @@ class _AtividadePageState extends State<AtividadePage> {
               const SizedBox(height: 30),
               Text(widget.enunciado, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
               const SizedBox(height: 30),
-              
               Expanded(
                 child: ListView(
                   children: widget.alternativas.map((alternativa) {
