@@ -33,17 +33,17 @@ class MyApp extends StatelessWidget {
           seedColor: const Color(0xFFFFB76F),
         ),
       ),
-      home: SinaisPage(nomeTema: "Animais",),
-      // initialRoute: '/home',
-      // routes: {
-      //   '/login': (context) => const LoginPage(),
-      //   '/cadastro': (context) => const CadastroPage(),
-      //   '/home': (context) => const HomePage(),
-      //   '/cadastro-categoria': (context) => const CadastroCategoriaPage(),
-      //   '/edicao-categoria': (context) => const EdicaoCategoriaPage(),
-      //   '/temas': (context) => const TemasPage(),
-      //   '/listagem_questoes': (context) => const ListagemQuestoesPage(),
-      //   '/cadastro-questao': (context) => const CadastroQuestaoPage(),
+      initialRoute: '/home',
+      routes: {
+        '/login': (context) => const LoginPage(),
+        '/cadastro': (context) => const CadastroPage(),
+        '/home': (context) => const HomePage(),
+        '/cadastro-categoria': (context) => const CadastroCategoriaPage(),
+        '/edicao-categoria': (context) => const EdicaoCategoriaPage(),
+        '/temas': (context) => const TemasPage(),
+        '/listagem_questoes': (context) => const ListagemQuestoesPage(),
+        '/cadastro-questao': (context) => const CadastroQuestaoPage(),
+        '/trilha': (context) => const TrilhaPage()
         
       // }
     );

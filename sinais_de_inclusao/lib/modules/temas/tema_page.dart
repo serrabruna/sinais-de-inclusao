@@ -41,7 +41,6 @@ class _TemasPageState extends State<TemasPage> {
     return response.data as List;
   }
 
-  
   void _recarregarTemas() {
     setState(() {
       _temasFuture = _fetchTemas();
@@ -54,7 +53,6 @@ class _TemasPageState extends State<TemasPage> {
       builder: (context) => ManagementBottomSheet(
         onCadastrar: () async {
           Navigator.pop(context);
-          
           await Navigator.pushNamed(context, '/cadastro-categoria');
           _recarregarTemas();
         },
@@ -63,14 +61,14 @@ class _TemasPageState extends State<TemasPage> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => SelecaoEdicaoPage(temas: temasAtuais)),
-          ).then((_) => _recarregarTemas()); 
+          ).then((_) => _recarregarTemas());
         },
         onExcluir: () {
           Navigator.pop(context);
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => SelecaoExclusaoPage(temas: temasAtuais)),
-          ).then((_) => _recarregarTemas()); 
+          ).then((_) => _recarregarTemas());
         },
       ),
     );
@@ -103,7 +101,6 @@ class _TemasPageState extends State<TemasPage> {
                   style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
-              
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: GridView.builder(
@@ -124,6 +121,20 @@ class _TemasPageState extends State<TemasPage> {
                   },
                 ),
               ),
+
+
+              if (!_isAdmin) ...[
+                const SizedBox(height: 30),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: FullWidthButton(
+                    titulo: "Começar Atividades",
+                    icone: Icons.play_arrow,
+                    onPressed: () => Navigator.pushNamed(context, '/trilha'),
+                  ),
+                ),
+              ],
+
               
               if (_isAdmin) ...[
                 const SizedBox(height: 30),
@@ -132,22 +143,22 @@ class _TemasPageState extends State<TemasPage> {
                   child: Column(
                     children: [
                       FullWidthButton(
-                        titulo: "Gerenciar Temas", 
-                        icone: Icons.settings, 
+                        titulo: "Gerenciar Temas",
+                        icone: Icons.settings,
                         onPressed: () => _mostrarOpcoesGerenciamento(context, temas),
                       ),
-                      const SizedBox(height: 15), 
+                      const SizedBox(height: 15),
                       FullWidthButton(
-                        titulo: "Gerenciar Questões", 
-                        icone: Icons.help_outline, 
+                        titulo: "Gerenciar Questões",
+                        icone: Icons.help_outline,
                         onPressed: () => Navigator.pushNamed(context, '/listagem_questoes')
-                            .then((_) => _recarregarTemas()), 
+                            .then((_) => _recarregarTemas()),
                       ),
                     ],
                   ),
                 ),
               ],
-              const SizedBox(height: 30), 
+              const SizedBox(height: 30),
               const FooterWidget(),
             ],
           );
