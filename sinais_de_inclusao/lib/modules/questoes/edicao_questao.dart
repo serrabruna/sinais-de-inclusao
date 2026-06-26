@@ -21,7 +21,6 @@ class _EdicaoQuestaoPageState extends State<EdicaoQuestaoPage> {
   final _alt1Controller = TextEditingController();
   final _alt2Controller = TextEditingController();
   final _alt3Controller = TextEditingController();
-  final _alt4Controller = TextEditingController(); 
   
   int? _idCategoriaSelecionada;
   List<Map<String, dynamic>> _listaCategorias = [];
@@ -40,7 +39,6 @@ class _EdicaoQuestaoPageState extends State<EdicaoQuestaoPage> {
       _alt1Controller.text = widget.questao.options[1];
       _alt2Controller.text = widget.questao.options[2];
       _alt3Controller.text = widget.questao.options[3];
-      _alt4Controller.text = widget.questao.options[4]; 
     }
     _buscarCategorias();
   }
@@ -54,7 +52,6 @@ class _EdicaoQuestaoPageState extends State<EdicaoQuestaoPage> {
     _alt1Controller.dispose();
     _alt2Controller.dispose();
     _alt3Controller.dispose();
-    _alt4Controller.dispose(); 
     super.dispose();
   }
 
@@ -93,7 +90,6 @@ class _EdicaoQuestaoPageState extends State<EdicaoQuestaoPage> {
           _alt1Controller.text.trim(),
           _alt2Controller.text.trim(),
           _alt3Controller.text.trim(),
-          _alt4Controller.text.trim(), 
         ],
       });
 
@@ -141,8 +137,7 @@ class _EdicaoQuestaoPageState extends State<EdicaoQuestaoPage> {
                   _construirCampoTexto(controller: _alt1Controller, hintText: 'Alternativa 1'),
                   _construirCampoTexto(controller: _alt2Controller, hintText: 'Alternativa 2'),
                   _construirCampoTexto(controller: _alt3Controller, hintText: 'Alternativa 3'),
-                  _construirCampoTexto(controller: _alt4Controller, hintText: 'Alternativa 4'), 
-                  
+        
                   const SizedBox(height: 25),
                   _carregando ? const Center(child: CircularProgressIndicator()) 
                     : Center(

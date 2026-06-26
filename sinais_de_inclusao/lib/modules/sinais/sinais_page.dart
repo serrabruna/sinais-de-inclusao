@@ -92,7 +92,7 @@ class _SinaisPageState extends State<SinaisPage> {
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
                 child: Image.network(
-                  sinal['imagePath'] ?? '',
+                  sinal['image_path'] ?? '',
                   fit: BoxFit.contain,
                   errorBuilder: (c, e, s) => Image.asset('assets/images/logocirculo.png'),
                 ),
