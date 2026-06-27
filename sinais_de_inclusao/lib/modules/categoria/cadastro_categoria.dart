@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
-import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
 
 class CadastroCategoriaPage extends StatefulWidget {
   const CadastroCategoriaPage({super.key});
@@ -13,8 +12,7 @@ class CadastroCategoriaPage extends StatefulWidget {
 
 class _CadastroCategoriaPageState extends State<CadastroCategoriaPage> {
   late TextEditingController _nomeController;
-  late TextEditingController _ordemController;
-  late TextEditingController _descricaoController;
+  late TextEditingController _descricaoController; 
 
   bool _carregando = false;
 
@@ -22,34 +20,23 @@ class _CadastroCategoriaPageState extends State<CadastroCategoriaPage> {
   void initState() {
     super.initState();
     _nomeController = TextEditingController();
-    _ordemController = TextEditingController(); 
-    _descricaoController = TextEditingController();
+    _descricaoController = TextEditingController(); 
   }
 
   @override
   void dispose() {
     _nomeController.dispose();
-    _ordemController.dispose();
-    _descricaoController.dispose();
+    _descricaoController.dispose(); 
     super.dispose();
   }
 
   void _enviarDados() async {
     String nome = _nomeController.text.trim();
-    String ordemTexto = _ordemController.text.trim();
     String descricao = _descricaoController.text.trim();
 
-    if (nome.isEmpty || ordemTexto.isEmpty || descricao.isEmpty) {
+    if (nome.isEmpty || descricao.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor, preencha todos os campos!')),
-      );
-      return;
-    }
-
-    int? ordemNumero = int.tryParse(ordemTexto);
-    if (ordemNumero == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, insira um número válido para a ordem!')),
       );
       return;
     }
@@ -71,7 +58,6 @@ class _CadastroCategoriaPageState extends State<CadastroCategoriaPage> {
       );
       
       _nomeController.clear();
-      _ordemController.clear();
       _descricaoController.clear();
       
     } on DioException catch (e) {
@@ -127,19 +113,6 @@ class _CadastroCategoriaPageState extends State<CadastroCategoriaPage> {
                     hintText: 'Ex: Animais',
                   ),
                   const SizedBox(height: 15),
-
-                  const Text(
-                    'Ordem:',
-                    style: TextStyle(color: Color(0xFF333333), fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 8),
-                  _construirCampoTexto(
-                    controller: _ordemController,
-                    hintText: 'Sequência que deve aparecer na tela. Ex: 3',
-                    keyboardType: TextInputType.number, 
-                  ),
-                  const SizedBox(height: 15),
-
                   const Text(
                     'Descrição:',
                     style: TextStyle(color: Color(0xFF333333), fontSize: 16, fontWeight: FontWeight.w500),
@@ -148,10 +121,8 @@ class _CadastroCategoriaPageState extends State<CadastroCategoriaPage> {
                   _construirCampoTexto(
                     controller: _descricaoController,
                     hintText: 'Insira a Descrição...',
-                    obscureText: false, 
                   ),
                   const SizedBox(height: 25),
-
                   _carregando
                       ? const Center(child: CircularProgressIndicator())
                       : Center(
