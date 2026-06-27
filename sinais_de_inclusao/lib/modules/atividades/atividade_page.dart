@@ -28,7 +28,7 @@ class _AtividadePageState extends State<AtividadePage> {
   String? _alternativaSelecionada;
   bool _enviando = false;
 
-  // ESTA É A CHAVE PARA O PROBLEMA DE ESTADO AO MUDAR DE ATIVIDADE
+  
   @override
   void didUpdateWidget(covariant AtividadePage oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -63,23 +63,34 @@ class _AtividadePageState extends State<AtividadePage> {
         _enviando = false;
       });
 
+      if (!mounted) return;
+
       if (acertou) {
-        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Correto! +10 XP'), backgroundColor: Colors.green)
+          const SnackBar(
+            content: Text('Correto! +10 XP'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 1), 
+          ),
         );
-        Future.delayed(const Duration(seconds: 1), () {
-          if (mounted) widget.onFinalizado(10);
-        });
-      } else {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Resposta errada, tente novamente!'), backgroundColor: Colors.red)
-        );
-        
-        // Reset para permitir nova tentativa
         Future.delayed(const Duration(seconds: 1), () {
           if (mounted) {
+            ScaffoldMessenger.of(context).clearSnackBars(); 
+            widget.onFinalizado(10);
+          }
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Resposta errada, tente novamente!'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 1),
+          ),
+        );
+
+        Future.delayed(const Duration(seconds: 1), () {
+          if (mounted) {
+            ScaffoldMessenger.of(context).clearSnackBars();
             setState(() {
               _alternativaSelecionada = null;
               _foiCorreto = null;
