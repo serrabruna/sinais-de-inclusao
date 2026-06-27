@@ -220,31 +220,45 @@ class _TrilhaPageState extends State<TrilhaPage> {
 
   Widget _buildHeader() => Padding(
     padding: const EdgeInsets.all(20.0),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    child: Column( 
       children: [
-        IconButton(
-          icon: const Icon(Icons.close, color: Colors.white70, size: 30),
-          onPressed: () => Navigator.pop(context),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.white24,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            children: [
-              Text(
-                '$_xpTotal ',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
+        Row( 
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.close, color: Colors.white70, size: 30),
+              onPressed: () => Navigator.pop(context),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white24,
+                borderRadius: BorderRadius.circular(20),
               ),
-              const Icon(Icons.star, color: Colors.amber, size: 22),
-            ],
+              child: Row(
+                children: [
+                  Text(
+                    '$_xpTotal ',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  const Icon(Icons.star, color: Colors.amber, size: 22),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20), 
+        const Text(
+          "Faça 100 pontos para desbloquear um novo nível",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.white70, 
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
