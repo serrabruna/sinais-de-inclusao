@@ -18,12 +18,13 @@ class _CadastroPageState extends State<CadastroPage> {
   late TextEditingController _senhaController;
   late TextEditingController _senhaConfirmacaoController;
 
-  // Variável para armazenar o perfil selecionado
   String? _perfilSelecionado;
 
   final List<String> _opcoesPerfil = ['Admin', 'Aluno'];
 
   bool _carregando = false;
+  bool _ocultarSenha = true;
+  bool _ocultarConfirmacaoSenha = true;
 
   @override
   void initState() {
@@ -176,7 +177,18 @@ class _CadastroPageState extends State<CadastroPage> {
                   _construirCampoTexto(
                     controller: _senhaController,
                     hintText: 'Insira sua senha...',
-                    obscureText: true,
+                    obscureText: _ocultarSenha,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _ocultarSenha ? Icons.visibility_off : Icons.visibility,
+                        color: const Color(0xFF623FBD),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _ocultarSenha = !_ocultarSenha;
+                        });
+                      },
+                    ),
                   ),
                   const SizedBox(height: 15),
 
@@ -192,7 +204,18 @@ class _CadastroPageState extends State<CadastroPage> {
                   _construirCampoTexto(
                     controller: _senhaConfirmacaoController,
                     hintText: 'Insira sua senha...',
-                    obscureText: true,
+                    obscureText: _ocultarConfirmacaoSenha,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _ocultarConfirmacaoSenha ? Icons.visibility_off : Icons.visibility,
+                        color: const Color(0xFF623FBD),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _ocultarConfirmacaoSenha = !_ocultarConfirmacaoSenha;
+                        });
+                      },
+                    ),
                   ),
                   const SizedBox(height: 25),
 
@@ -309,6 +332,7 @@ class _CadastroPageState extends State<CadastroPage> {
     required String hintText,
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
+    Widget? suffixIcon,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -335,6 +359,7 @@ class _CadastroPageState extends State<CadastroPage> {
             vertical: 15,
           ),
           border: InputBorder.none,
+          suffixIcon: suffixIcon,
         ),
       ),
     );

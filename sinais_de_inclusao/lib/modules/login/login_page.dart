@@ -24,6 +24,9 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _carregando = false;
 
+  // Controle de visibilidade da senha
+  bool _ocultarSenha = true;
+
   @override
   void initState() {
     super.initState();
@@ -149,7 +152,18 @@ class _LoginPageState extends State<LoginPage> {
                   _construirCampoTexto(
                     controller: _senhaController,
                     hintText: 'Insira sua senha...',
-                    obscureText: true,
+                    obscureText: _ocultarSenha,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _ocultarSenha ? Icons.visibility_off : Icons.visibility,
+                        color: const Color(0xFF623FBD),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _ocultarSenha = !_ocultarSenha;
+                        });
+                      },
+                    ),
                   ),
                   const SizedBox(height: 20),
 
@@ -224,6 +238,7 @@ class _LoginPageState extends State<LoginPage> {
     required String hintText,
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
+    Widget? suffixIcon,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -250,6 +265,7 @@ class _LoginPageState extends State<LoginPage> {
             vertical: 15,
           ),
           border: InputBorder.none,
+          suffixIcon: suffixIcon,
         ),
       ),
     );
