@@ -75,11 +75,7 @@ class _CadastroPageState extends State<CadastroPage> {
         if (response.statusCode == 201) {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Conta criada!')));
-          if (Navigator.canPop(context)) {
-            Navigator.pop(context);
-          } else {
-            Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-          }
+          Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
         }
       } on DioException catch (e) {
         String erro = e.response?.data['error'] ?? 'Erro ao cadastrar';
