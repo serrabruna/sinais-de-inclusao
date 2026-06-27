@@ -57,6 +57,7 @@ class _CadastroCategoriaPageState extends State<CadastroCategoriaPage> {
         SnackBar(content: Text('Categoria "$nome" cadastrada com sucesso!')),
       );
       
+      Navigator.pop(context, true);
       _nomeController.clear();
       _descricaoController.clear();
       

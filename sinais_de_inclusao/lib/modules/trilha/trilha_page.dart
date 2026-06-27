@@ -285,7 +285,14 @@ class _TrilhaPageState extends State<TrilhaPage> {
             color: Colors.black38,
             size: 32,
           ),
-          onPressed: () {},
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Em breve!"),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          },
         ),
       ],
     ),
