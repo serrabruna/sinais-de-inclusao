@@ -13,10 +13,13 @@ class SelecaoEdicaoPage extends StatelessWidget {
         itemCount: temas.length,
         itemBuilder: (context, i) => ListTile(
           title: Text(temas[i]['name']),
-          onTap: () => Navigator.push(
-            context, 
-            MaterialPageRoute(builder: (_) => EdicaoCategoriaPage(categoria: temas[i]))
-          ),
+          onTap: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => EdicaoCategoriaPage(categoria: temas[i]))
+            );
+            if (result == true) Navigator.pop(context); 
+          },
         ),
       ),
     );

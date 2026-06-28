@@ -19,7 +19,6 @@ class _CadastroQuestaoPageState extends State<CadastroQuestaoPage> {
   final _alt1Controller = TextEditingController();
   final _alt2Controller = TextEditingController();
   final _alt3Controller = TextEditingController();
-  final _alt4Controller = TextEditingController(); 
 
   int? _idCategoriaSelecionada;
   List<Map<String, dynamic>> _listaCategorias = [];
@@ -40,7 +39,6 @@ class _CadastroQuestaoPageState extends State<CadastroQuestaoPage> {
     _alt1Controller.dispose();
     _alt2Controller.dispose();
     _alt3Controller.dispose();
-    _alt4Controller.dispose(); 
     super.dispose();
   }
 
@@ -78,7 +76,6 @@ class _CadastroQuestaoPageState extends State<CadastroQuestaoPage> {
           _alt1Controller.text.trim(),
           _alt2Controller.text.trim(),
           _alt3Controller.text.trim(),
-          _alt4Controller.text.trim(), 
         ],
       });
 
@@ -131,7 +128,6 @@ class _CadastroQuestaoPageState extends State<CadastroQuestaoPage> {
                 _construirCampoTexto(controller: _alt1Controller, hintText: 'Alternativa 1'),
                 _construirCampoTexto(controller: _alt2Controller, hintText: 'Alternativa 2'),
                 _construirCampoTexto(controller: _alt3Controller, hintText: 'Alternativa 3'),
-                _construirCampoTexto(controller: _alt4Controller, hintText: 'Alternativa 4'),
                 
                 const SizedBox(height: 20),
                 _carregando 

@@ -57,12 +57,12 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
     return AtividadePage(
       idQuestao: (q['id'] ?? 0).toInt(),
       enunciado: (q['statement'] ?? 'Sem enunciado').toString(),
-      urlMidia: (q['imagePath'] ?? '').toString(),
+      urlMidia: (q['image_path'] ?? '').toString(),
       
       alternativas: q['options'] != null 
           ? List<String>.from(q['options']) 
           : [],
-      alternativaCorreta: (q['correctAnswer'] ?? '').toString(),
+      alternativaCorreta: (q['correct_answer'] ?? '').toString(),
       onFinalizado: _irParaProxima, 
     );
   }

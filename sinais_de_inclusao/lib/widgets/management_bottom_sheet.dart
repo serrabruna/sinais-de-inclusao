@@ -31,10 +31,7 @@ class ManagementBottomSheet extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.delete, color: Colors.red),
             title: const Text("Excluir Categoria"),
-            onTap: () {
-              Navigator.pop(context);
-              onExcluir();
-            },
+            onTap: onExcluir     
           ),
         ],
       ),
