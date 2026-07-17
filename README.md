@@ -31,7 +31,7 @@ O aplicativo foi idealizado para promover a acessibilidade e a inclusão digital
 ## 🎨 Interface & Visual
 
 <p align="center">
-  <img src="assets/images/home.jpeg" width="30%" alt="Tela Inicial" />
+  <img src="sinais_de_inclusao/assets/images/home.jpeg" width="30%" alt="Tela Inicial" />
   <img src="assets/images/cadastro.jpeg" width="30%" alt="Tela de Cadastro" />
   <img src="assets/images/login.jpeg" width="30%" alt="Tela de Login" />
 </p>
