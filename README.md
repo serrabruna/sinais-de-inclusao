@@ -73,5 +73,5 @@ Antes de começar, você vai precisar ter instalado em sua máquina:
    flutter run
 
 ## 👥 Equipe de Desenvolvimento
-*   **[Bruna Serra](https://github.com/serrabruna)
-*   **[Victoria Benfica](https://github.com/VicBenfica)
+*   [Bruna Serra](https://github.com/serrabruna)
+*   [Victoria Benfica](https://github.com/VicBenfica)
