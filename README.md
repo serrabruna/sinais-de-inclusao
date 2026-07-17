@@ -32,8 +32,12 @@ O aplicativo foi idealizado para promover a acessibilidade e a inclusão digital
 
 <p align="center">
   <img src="sinais_de_inclusao/assets/images/home.jpeg" width="30%" alt="Tela Inicial" />
-  <img src="assets/images/cadastro.jpeg" width="30%" alt="Tela de Cadastro" />
-  <img src="assets/images/login.jpeg" width="30%" alt="Tela de Login" />
+  <img src="sinais_de_inclusao/assets/images/cadastro.jpeg" width="30%" alt="Tela de Cadastro" />
+  <img src="sinais_de_inclusao/assets/images/login.jpeg" width="30%" alt="Tela de Login" />
+  <img src="sinais_de_inclusao/assets/images/temas.jpeg" width="30%" alt="Tela de Temas" />
+  <img src="sinais_de_inclusao/assets/images/temaDetalhes.jpeg" width="30%" alt="Tela de detalhes de cada tema" />
+  <img src="sinais_de_inclusao/assets/images/trilhas.jpeg" width="30%" alt="Tela de Trilhas" />
+  <img src="sinais_de_inclusao/assets/images/atividade.jpeg" width="30%" alt="Tela de Atividades" />
 </p>
 
 ---
