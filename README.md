@@ -30,11 +30,10 @@ O aplicativo foi idealizado para promover a acessibilidade e a inclusão digital
 
 ## 🎨 Interface & Visual
 
-*(Dica: Adicione aqui capturas de tela ou GIFs do aplicativo rodando para prender a atenção do recrutador!)*
-
 <p align="center">
-  <img src="path/to/your/screenshot1.png" width="30%" alt="Tela Inicial" />
-  <img src="path/to/your/screenshot2.png" width="30%" alt="Tela de Módulos" />
+  <img src="assets/images/home.jpeg" width="30%" alt="Tela Inicial" />
+  <img src="assets/images/cadastro.jpeg" width="30%" alt="Tela de Cadastro" />
+  <img src="assets/images/login.jpeg" width="30%" alt="Tela de Login" />
 </p>
 
 ---
