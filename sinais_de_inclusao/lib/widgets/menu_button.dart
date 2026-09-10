@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class MenuButton extends StatelessWidget {
   final String titulo;
   final IconData icone;
-  final VoidCallback onPressed;
+  final VoidCallback onPressed; //funcao
 
   const MenuButton({
     super.key,
