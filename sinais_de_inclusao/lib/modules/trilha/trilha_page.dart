@@ -29,21 +29,21 @@ class _TrilhaPageState extends State<TrilhaPage> {
   }
 
   Future<void> _fetchXP() async {
-  try {
-    final dio = await DioClient.getInstance();
-    final response = await dio.get('/user/xp'); 
-    
-    if (mounted && response.data != null) {
-      setState(() {
-        _xpTotal = (response.data['xp'] ?? 0).toInt();
-        _isLoadingXp = false;
-      });
+    try {
+      final dio = await DioClient.getInstance();
+      final response = await dio.get('/user/xp');
+
+      if (mounted && response.data != null) {
+        setState(() {
+          _xpTotal = (response.data['xp'] ?? 0).toInt();
+          _isLoadingXp = false;
+        });
+      }
+    } catch (e) {
+      debugPrint("Erro ao carregar XP: $e");
+      if (mounted) setState(() => _isLoadingXp = false);
     }
-  } catch (e) {
-    debugPrint("Erro ao carregar XP: $e");
-    if (mounted) setState(() => _isLoadingXp = false);
   }
-}
 
   void _iniciarTrilha(int idCategoria) async {
     try {
@@ -220,9 +220,9 @@ class _TrilhaPageState extends State<TrilhaPage> {
 
   Widget _buildHeader() => Padding(
     padding: const EdgeInsets.all(20.0),
-    child: Column( 
+    child: Column(
       children: [
-        Row( 
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
@@ -251,12 +251,12 @@ class _TrilhaPageState extends State<TrilhaPage> {
             ),
           ],
         ),
-        const SizedBox(height: 20), 
+        const SizedBox(height: 20),
         const Text(
           "Faça 100 pontos para desbloquear um novo nível",
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: Colors.white70, 
+            color: Colors.white70,
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),

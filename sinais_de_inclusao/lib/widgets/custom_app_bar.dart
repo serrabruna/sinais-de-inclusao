@@ -42,7 +42,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
         PopupMenuButton<String>(
           icon: const Icon(Icons.menu, color: Colors.white, size: 35),
           onSelected: (value) async {
-            if (value == 'temas') {
+            if (value == 'temaPs') {
               Navigator.pushNamed(context, '/temas');
             } else if (value == 'logout') {
               final prefs = await SharedPreferences.getInstance();

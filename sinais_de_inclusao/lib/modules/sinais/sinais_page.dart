@@ -70,7 +70,6 @@ class _SinaisPageState extends State<SinaisPage> {
       ),
     );
   }
-
   
   Widget _buildCardSinal(dynamic sinal) {
     return Padding(
