@@ -29,21 +29,21 @@ class _TrilhaPageState extends State<TrilhaPage> {
   }
 
   Future<void> _fetchXP() async {
-  try {
-    final dio = await DioClient.getInstance();
-    final response = await dio.get('/user/xp'); 
-    
-    if (mounted && response.data != null) {
-      setState(() {
-        _xpTotal = (response.data['xp'] ?? 0).toInt();
-        _isLoadingXp = false;
-      });
+    try {
+      final dio = await DioClient.getInstance();
+      final response = await dio.get('/user/xp');
+
+      if (mounted && response.data != null) {
+        setState(() {
+          _xpTotal = (response.data['xp'] ?? 0).toInt();
+          _isLoadingXp = false;
+        });
+      }
+    } catch (e) {
+      debugPrint("Erro ao carregar XP: $e");
+      if (mounted) setState(() => _isLoadingXp = false);
     }
-  } catch (e) {
-    debugPrint("Erro ao carregar XP: $e");
-    if (mounted) setState(() => _isLoadingXp = false);
   }
-}
 
   void _iniciarTrilha(int idCategoria) async {
     try {
@@ -192,7 +192,7 @@ class _TrilhaPageState extends State<TrilhaPage> {
                         right: 4,
                         child: CircleAvatar(
                           radius: 12,
-                          backgroundColor: Colors.white,
+                          backgroundColor:  Color.fromARGB(255, 157, 229, 255),
                           child: Icon(
                             Icons.lock,
                             color: Color(0xFF623FBD),
@@ -220,9 +220,9 @@ class _TrilhaPageState extends State<TrilhaPage> {
 
   Widget _buildHeader() => Padding(
     padding: const EdgeInsets.all(20.0),
-    child: Column( 
+    child: Column(
       children: [
-        Row( 
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
@@ -251,12 +251,12 @@ class _TrilhaPageState extends State<TrilhaPage> {
             ),
           ],
         ),
-        const SizedBox(height: 20), 
+        const SizedBox(height: 20),
         const Text(
           "Faça 100 pontos para desbloquear um novo nível",
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: Colors.white70, 
+            color: Colors.white70,
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -276,22 +276,28 @@ class _TrilhaPageState extends State<TrilhaPage> {
       children: [
         IconButton(
           icon: const Icon(Icons.home, color: Color(0xFF623FBD), size: 32),
-          onPressed: () {},
-        ),
-        Image.asset('assets/images/logocirculo.png', height: 50),
-        IconButton(
-          icon: const Icon(
-            Icons.bookmark_border,
-            color: Colors.black38,
-            size: 32,
-          ),
           onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Em breve!"),
-                duration: Duration(seconds: 2),
+            Navigator.pushReplacementNamed(context, '/temas');
+          },
+        ),
+        Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: const Color.fromARGB(36, 42, 42, 42),
+                blurRadius: 8,
+                spreadRadius: 1,
+                offset: const Offset(0, 2),
               ),
-            );
+            ],
+          ),
+          child: Image.asset('assets/images/logocirculo.png', height: 50),
+        ),
+        IconButton(
+          icon: const Icon(Icons.favorite, color: Color(0xFF623FBD), size: 32),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/favoritos');
           },
         ),
       ],

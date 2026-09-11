@@ -46,83 +46,11 @@ class _CustomAppBarState extends State<CustomAppBar> {
     return AppBar(
       toolbarHeight: 100,
       //altura interna 100px
-      backgroundColor: const Color(0xFF623FBD),
+      backgroundColor:const Color(0xFF623FBD),
       elevation: 0,
 
       title: Image.asset('assets/images/logocirculo.png', height: 70),
 
-      actions: [
-        PopupMenuButton<String>(
-          icon: const Icon(Icons.menu, color: Colors.white, size: 35),
-
-          onSelected: (value) async {
-            if (value == 'temas') {
-              Navigator.pushNamed(context, '/temas');
-            } else if (value == 'logout') {
-              final prefs = await SharedPreferences.getInstance();
-              //abre a instancia do banco de dados local do celular, como é uma operação de leitura/escrita usa se await
-            } else if (value == 'favoritos') {
-              Navigator.pushNamed(context, '/favoritos');
-            } else if (value == 'logout') {
-              final prefs = await SharedPreferences.getInstance();
-
-              await prefs.remove('token');
-              await prefs.remove('role');
-              //apaga as chaves de seguraça
-              if (context.mounted) {
-                //verifica se a tela ainda existe associalda ao contexto visual
-                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                //vai para a pagina home, destroi todas as telas anteriores que estavam salvas na memoria
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/home',
-                  (route) => false,
-                );
-              }
-            }
-          },
-
-          itemBuilder: (BuildContext context) => [
-            if (_autenticado) ...[
-              const PopupMenuItem<String>(
-                value: 'temas',
-                child: Row(
-                  children: [
-                    Icon(Icons.menu_book, color: Color(0xFF623FBD)),
-                    SizedBox(width: 10),
-                    Text("Temas"),
-                  ],
-                ),
-              ),
-
-              const PopupMenuItem<String>(
-                value: 'favoritos',
-                child: Row(
-                  children: [
-                    Icon(Icons.favorite, color: Color(0xFF623FBD)),
-                    SizedBox(width: 10),
-                    Text("Favoritos"),
-                  ],
-                ),
-              ),
-
-              // SAIR
-              const PopupMenuItem<String>(
-                value: 'logout',
-                child: Row(
-                  children: [
-                    Icon(Icons.logout, color: Colors.red),
-                    SizedBox(width: 10),
-                    Text("Sair"),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-
-        const SizedBox(width: 10),
-      ],
 
       automaticallyImplyLeading: false,
       //esconde o menu automatico

@@ -43,12 +43,7 @@ class _FavoritosPageState extends State<FavoritosPage> {
     try {
       final dio = await DioClient.getInstance();
 
-      await dio.post(
-        '/favorites',
-        data: {
-          'signId': signId,
-        },
-      );
+      await dio.post('/favorites', data: {'signId': signId});
 
       if (!mounted) return;
 
@@ -57,9 +52,7 @@ class _FavoritosPageState extends State<FavoritosPage> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Sinal removido dos favoritos'),
-        ),
+        const SnackBar(content: Text('Sinal removido dos favoritos')),
       );
     } catch (e) {
       debugPrint('ERRO AO REMOVER FAVORITO: $e');
@@ -67,9 +60,7 @@ class _FavoritosPageState extends State<FavoritosPage> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Erro ao atualizar favorito'),
-        ),
+        const SnackBar(content: Text('Erro ao atualizar favorito')),
       );
     }
   }
@@ -83,34 +74,26 @@ class _FavoritosPageState extends State<FavoritosPage> {
 
       body: Column(
         children: [
-
           const Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: 25,
-            ),
+            padding: EdgeInsets.symmetric(vertical: 25),
             child: Text(
               'Favoritos',
               style: TextStyle(
-                color: Colors.white,
+                color: Color(0xFFFFB46E),
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
 
-          
           Expanded(
             child: FutureBuilder<List<dynamic>>(
               future: _favoritosFuture,
 
               builder: (context, snapshot) {
-
-                if (snapshot.connectionState ==
-                    ConnectionState.waiting) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                    ),
+                    child: CircularProgressIndicator(color: Colors.white),
                   );
                 }
 
@@ -119,9 +102,7 @@ class _FavoritosPageState extends State<FavoritosPage> {
                     child: Text(
                       'Erro ao carregar favoritos.\n${snapshot.error}',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                      ),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   );
                 }
@@ -131,10 +112,8 @@ class _FavoritosPageState extends State<FavoritosPage> {
                 if (favoritos.isEmpty) {
                   return const Center(
                     child: Column(
-                      mainAxisAlignment:
-                          MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-
                         Icon(
                           Icons.favorite_border,
                           color: Colors.white,
@@ -156,10 +135,7 @@ class _FavoritosPageState extends State<FavoritosPage> {
                         SizedBox(height: 8),
 
                         Padding(
-                          padding:
-                              EdgeInsets.symmetric(
-                            horizontal: 35,
-                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 35),
                           child: Text(
                             'Favorite os sinais que deseja encontrar mais facilmente.',
                             textAlign: TextAlign.center,
@@ -175,24 +151,16 @@ class _FavoritosPageState extends State<FavoritosPage> {
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 22,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 22),
 
                   itemCount: favoritos.length,
 
                   itemBuilder: (context, index) {
-                    final favorito =
-                        favoritos[index];
+                    final favorito = favoritos[index];
 
-                    debugPrint(
-                      'FAVORITO $index: $favorito',
-                    );
+                    debugPrint('FAVORITO $index: $favorito');
 
-                    
-                    final sinal =
-                        favorito['sign'] ??
-                        favorito;
+                    final sinal = favorito['sign'] ?? favorito;
 
                     return _buildCardSinal(sinal);
                   },
@@ -200,31 +168,69 @@ class _FavoritosPageState extends State<FavoritosPage> {
               },
             ),
           ),
-
         ],
+      ),
+
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Container(
+          height: 70,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(25),
+              topRight: Radius.circular(25),
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: _bottomMenuItem(
+                  titulo: 'Início',
+                  icone: Icons.home,
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/temas');
+                  },
+                ),
+              ),
+              Expanded(
+                child: _bottomMenuItem(
+                  titulo: 'Favoritos',
+                  icone: Icons.favorite,
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/favoritos');
+                  },
+                ),
+              ),
+              Expanded(
+                child: _bottomMenuItem(
+                  titulo: 'Perfil',
+                  icone: Icons.person,
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/perfil');
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildCardSinal(dynamic sinal) {
-
     debugPrint('CARD SINAL: $sinal');
 
-  
-    final String imagePath =
-        sinal['imagePath'] ?? '';
+    final String imagePath = sinal['imagePath'] ?? '';
 
     return Padding(
-      padding: const EdgeInsets.only(
-        bottom: 25,
-      ),
+      padding: const EdgeInsets.only(bottom: 25),
 
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
 
-          borderRadius:
-              BorderRadius.circular(25),
+          borderRadius: BorderRadius.circular(25),
 
           boxShadow: const [
             BoxShadow(
@@ -237,20 +243,16 @@ class _FavoritosPageState extends State<FavoritosPage> {
 
         child: Column(
           children: [
-
             Stack(
               children: [
-
                 Container(
                   height: 200,
                   width: double.infinity,
 
-                  padding:
-                      const EdgeInsets.all(15),
+                  padding: const EdgeInsets.all(15),
 
                   child: ClipRRect(
-                    borderRadius:
-                        BorderRadius.circular(25),
+                    borderRadius: BorderRadius.circular(25),
 
                     child: imagePath.isNotEmpty
                         ? Image.network(
@@ -258,29 +260,18 @@ class _FavoritosPageState extends State<FavoritosPage> {
 
                             fit: BoxFit.contain,
 
-                            errorBuilder:
-                                (
-                                  context,
-                                  error,
-                                  stackTrace,
-                                ) {
-
-                              debugPrint(
-                                'ERRO IMAGEM: $error',
-                              );
+                            errorBuilder: (context, error, stackTrace) {
+                              debugPrint('ERRO IMAGEM: $error');
 
                               return Image.asset(
                                 'assets/images/logocirculo.png',
                               );
                             },
                           )
-                        : Image.asset(
-                            'assets/images/logocirculo.png',
-                          ),
+                        : Image.asset('assets/images/logocirculo.png'),
                   ),
                 ),
 
-                
                 Positioned(
                   top: 10,
                   right: 10,
@@ -293,19 +284,12 @@ class _FavoritosPageState extends State<FavoritosPage> {
                     ),
 
                     onPressed: () {
-                  
-                      final signId =
-                          sinal['id'] ??
-                          sinal['signId'];
+                      final signId = sinal['id'] ?? sinal['signId'];
 
                       if (signId != null) {
-                        _toggleFavorito(
-                          signId,
-                        );
+                        _toggleFavorito(signId);
                       } else {
-                        debugPrint(
-                          'ID DO SINAL NÃO ENCONTRADO: $sinal',
-                        );
+                        debugPrint('ID DO SINAL NÃO ENCONTRADO: $sinal');
                       }
                     },
                   ),
@@ -314,36 +298,50 @@ class _FavoritosPageState extends State<FavoritosPage> {
             ),
 
             Padding(
-              padding:
-                  const EdgeInsets.only(
-                left: 20,
-                right: 20,
-                bottom: 25,
-              ),
+              padding: const EdgeInsets.only(left: 20, right: 20, bottom: 25),
 
               child: Text(
-                sinal['name'] ??
-                    'Sem nome',
+                sinal['name'] ?? 'Sem nome',
 
-                textAlign:
-                    TextAlign.center,
+                textAlign: TextAlign.center,
 
-                style:
-                    const TextStyle(
-                  color:
-                      Color(0xFF623FBD),
+                style: const TextStyle(
+                  color: Color(0xFF623FBD),
 
                   fontSize: 22,
 
-                  fontWeight:
-                      FontWeight.bold,
+                  fontWeight: FontWeight.bold,
                 ),
-                
-              ),                     
-            ), 
-          ], 
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+}
+
+Widget _bottomMenuItem({
+  required String titulo,
+  required IconData icone,
+  required VoidCallback onPressed,
+}) {
+  return InkWell(
+    onTap: onPressed,
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icone, size: 28, color: const Color(0xFF623FBD)),
+        const SizedBox(height: 2),
+        Text(
+          titulo,
+          style: const TextStyle(
+            color: Color(0xFF623FBD),
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    ),
+  );
 }

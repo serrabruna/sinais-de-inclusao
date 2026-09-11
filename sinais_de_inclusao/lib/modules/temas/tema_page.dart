@@ -48,7 +48,10 @@ class _TemasPageState extends State<TemasPage> {
     });
   }
 
-  void _mostrarOpcoesGerenciamento(BuildContext context, List<dynamic> temasAtuais) {
+  void _mostrarOpcoesGerenciamento(
+    BuildContext context,
+    List<dynamic> temasAtuais,
+  ) {
     showModalBottomSheet(
       context: context,
       builder: (context) => ManagementBottomSheet(
@@ -61,14 +64,18 @@ class _TemasPageState extends State<TemasPage> {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => SelecaoEdicaoPage(temas: temasAtuais)),
+            MaterialPageRoute(
+              builder: (context) => SelecaoEdicaoPage(temas: temasAtuais),
+            ),
           ).then((_) => _recarregarTemas());
         },
         onExcluir: () {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => SelecaoExclusaoPage(temas: temasAtuais)),
+            MaterialPageRoute(
+              builder: (context) => SelecaoExclusaoPage(temas: temasAtuais),
+            ),
           ).then((_) => _recarregarTemas());
         },
       ),
@@ -84,10 +91,17 @@ class _TemasPageState extends State<TemasPage> {
         future: _temasFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: Colors.white));
+            return const Center(
+              child: CircularProgressIndicator(color: Colors.white),
+            );
           }
           if (snapshot.hasError || !snapshot.hasData) {
-            return const Center(child: Text("Erro ao carregar temas", style: TextStyle(color: Colors.white)));
+            return const Center(
+              child: Text(
+                "Erro ao carregar temas",
+                style: TextStyle(color: Colors.white),
+              ),
+            );
           }
 
           final temas = snapshot.data!;
@@ -96,10 +110,29 @@ class _TemasPageState extends State<TemasPage> {
             children: [
               const Padding(
                 padding: EdgeInsets.all(20.0),
-                child: Text(
-                  "Temas\nQuais sinais você quer aprender hoje?",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                child: Column(
+                  children: [
+                    Text(
+                      "Temas",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFFFFB46E),
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      "Quais sinais você quer aprender hoje?",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 23,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                  ],
                 ),
               ),
               Padding(
@@ -109,11 +142,15 @@ class _TemasPageState extends State<TemasPage> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: temas.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, mainAxisSpacing: 20, crossAxisSpacing: 20,
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 20,
+                    crossAxisSpacing: 20,
                   ),
                   itemBuilder: (context, index) {
                     final tema = temas[index];
-                    final String nome = tema is Map ? tema['name'] : tema.toString();
+                    final String nome = tema is Map
+                        ? tema['name']
+                        : tema.toString();
                     final int id = tema is Map ? tema['id'] : index;
 
                     return MenuButton(
@@ -124,10 +161,8 @@ class _TemasPageState extends State<TemasPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SinaisPage(
-                              idCategoria: id,
-                              nomeTema: nome,
-                            ),
+                            builder: (context) =>
+                                SinaisPage(idCategoria: id, nomeTema: nome),
                           ),
                         );
                       },
@@ -137,17 +172,34 @@ class _TemasPageState extends State<TemasPage> {
               ),
 
               if (!_isAdmin) ...[
-                const SizedBox(height: 30),
+                const SizedBox(height: 40),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: FullWidthButton(
-                    titulo: "Começar Atividades",
-                    icone: Icons.play_arrow,
-                    onPressed: () => Navigator.pushNamed(context, '/trilha'),
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Pronto para praticar?',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 23,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(height: 35),
+
+                      FullWidthButton(
+                        titulo: "Começar Atividades",
+                        icone: Icons.play_arrow_rounded,
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/trilha'),
+                      ),
+                    ],
                   ),
                 ),
               ],
-              
+
               if (_isAdmin) ...[
                 const SizedBox(height: 30),
                 Padding(
@@ -157,24 +209,95 @@ class _TemasPageState extends State<TemasPage> {
                       FullWidthButton(
                         titulo: "Gerenciar Temas",
                         icone: Icons.settings,
-                        onPressed: () => _mostrarOpcoesGerenciamento(context, temas),
+                        onPressed: () =>
+                            _mostrarOpcoesGerenciamento(context, temas),
                       ),
                       const SizedBox(height: 15),
                       FullWidthButton(
                         titulo: "Gerenciar Questões",
                         icone: Icons.help_outline,
-                        onPressed: () => Navigator.pushNamed(context, '/listagem_questoes')
-                            .then((_) => _recarregarTemas()),
+                        onPressed: () => Navigator.pushNamed(
+                          context,
+                          '/listagem_questoes',
+                        ).then((_) => _recarregarTemas()),
                       ),
                     ],
                   ),
                 ),
               ],
               const SizedBox(height: 30),
-              const FooterWidget(),
             ],
           );
         },
+      ),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Container(
+          height: 70,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(25),
+              topRight: Radius.circular(25),
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: _bottomMenuItem(
+                  titulo: 'Início',
+                  icone: Icons.home,
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/temas');
+                  },
+                ),
+              ),
+              Expanded(
+                child: _bottomMenuItem(
+                  titulo: 'Favoritos',
+                  icone: Icons.favorite,
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/favoritos');
+                  },
+                ),
+              ),
+              Expanded(
+                child: _bottomMenuItem(
+                  titulo: 'Perfil',
+                  icone: Icons.person,
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/perfil');
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _bottomMenuItem({
+    required String titulo,
+    required IconData icone,
+    required VoidCallback onPressed,
+  }) {
+    return InkWell(
+      onTap: onPressed,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icone, size: 28, color: const Color(0xFF623FBD)),
+          const SizedBox(height: 2),
+          Text(
+            titulo,
+            style: const TextStyle(
+              color: Color(0xFF623FBD),
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
+import 'package:sinais_de_inclusao/widgets/menu_button.dart';
 
 class SinaisPage extends StatefulWidget {
   final int idCategoria;
@@ -138,6 +139,51 @@ class _SinaisPageState extends State<SinaisPage> {
           ),
         ],
       ),
+
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Container(
+          height: 70,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(25),
+              topRight: Radius.circular(25),
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: _bottomMenuItem(
+                  titulo: 'Início',
+                  icone: Icons.home,
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/temas');
+                  },
+                ),
+              ),
+              Expanded(
+                child: _bottomMenuItem(
+                  titulo: 'Favoritos',
+                  icone: Icons.favorite,
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/favoritos');
+                  },
+                ),
+              ),
+              Expanded(
+                child: _bottomMenuItem(
+                  titulo: 'Perfil',
+                  icone: Icons.person,
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/perfil');
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -225,4 +271,29 @@ class _SinaisPageState extends State<SinaisPage> {
       ),
     );
   }
+}
+
+Widget _bottomMenuItem({
+  required String titulo,
+  required IconData icone,
+  required VoidCallback onPressed,
+}) {
+  return InkWell(
+    onTap: onPressed,
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icone, size: 28, color: const Color(0xFF623FBD)),
+        const SizedBox(height: 2),
+        Text(
+          titulo,
+          style: const TextStyle(
+            color: Color(0xFF623FBD),
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    ),
+  );
 }

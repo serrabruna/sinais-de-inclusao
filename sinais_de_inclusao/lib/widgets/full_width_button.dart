@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
 class FullWidthButton extends StatelessWidget {
-  //steteless pq ele nao atualiza, muda nada, apenas exibe
   final String titulo;
   final IconData icone;
   final VoidCallback onPressed;
-  //função ou ação quanod clicar
+
   const FullWidthButton({
     super.key,
     required this.titulo,
@@ -17,23 +16,51 @@ class FullWidthButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 55,
-      child: ElevatedButton.icon(
+      height: 65,
+      child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
+          backgroundColor: const Color(0xFFFFB46E),
           foregroundColor: const Color(0xFF623FBD),
-          elevation: 2,
-          //elevation é sombra 
+
+          elevation: 6,
+          shadowColor: Colors.black38,
+
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-            //altera a borda para um borda crsular 15
+            borderRadius: BorderRadius.circular(25),
           ),
+
+          padding: const EdgeInsets.symmetric(horizontal: 20),
         ),
-        icon: Icon(icone),
-        label: Text(
-          titulo,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Círculo do ícone
+            Container(
+              width: 38,
+              height: 38,
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(159, 255, 255, 255),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.play_arrow_rounded,
+                color: Color(0xFF623FBD),
+                size: 28,
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            Text(
+              titulo,
+              style: const TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF623FBD),
+              ),
+            ),
+          ],
         ),
       ),
     );
