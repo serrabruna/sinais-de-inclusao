@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/modules/atividades/atividade_page.dart';
+import 'package:sinais_de_inclusao/service/streak_service.dart';
 
 class FlowAtividadesPage extends StatefulWidget {
   final List<dynamic> questoes;
@@ -50,7 +51,7 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
     }
   }
 
-  void _exibirModalParabens() {
+void _exibirModalParabens() {
     final int total = widget.questoes.length;
     final double taxa = total > 0 ? (_acertos / total) : 0;
 
@@ -163,7 +164,11 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
+                    if (_acertos > 0) {
+                      await StreakService.registrarTreinoConcluido();
+                    }
+                    if (!ctx.mounted) return;
                     Navigator.pop(ctx);
                     Navigator.pop(context, {
                       'xp': _xpTotalNoFluxo,
