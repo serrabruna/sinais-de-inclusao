@@ -18,10 +18,6 @@ class _CadastroPageState extends State<CadastroPage> {
   late TextEditingController _senhaController;
   late TextEditingController _senhaConfirmacaoController;
 
-  String? _perfilSelecionado;
-
-  final List<String> _opcoesPerfil = ['Admin', 'Aluno'];
-
   bool _carregando = false;
   bool _ocultarSenha = true;
   bool _ocultarConfirmacaoSenha = true;
@@ -45,45 +41,44 @@ class _CadastroPageState extends State<CadastroPage> {
   }
 
   void _enviarDados() async {
-      if (_perfilSelecionado == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Por favor, selecione um perfil!')),
-        );
-        return;
-      }
-      if (_senhaController.text.trim() != _senhaConfirmacaoController.text.trim()) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('As senhas não coincidem!')),
-        );
-        return;
-      }
+    if (_senhaController.text.trim() !=
+        _senhaConfirmacaoController.text.trim()) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('As senhas não coincidem!')));
+      return;
+    }
 
-      setState(() => _carregando = true);
+    setState(() => _carregando = true);
 
-      try {
-        final dio = await DioClient.getInstance();
-        
-        final response = await dio.post(
-          'signup',
-          data: {
-            'email': _emailController.text.trim(),
-            'password': _senhaController.text.trim(),
-            'name': _nomeController.text.trim(),
-            'role': _perfilSelecionado!.toLowerCase(),
-          },
-        );
+    try {
+      final dio = await DioClient.getInstance();
 
-        if (response.statusCode == 201) {
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Conta criada!')));
-          Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-        }
-      } on DioException catch (e) {
-        String erro = e.response?.data['error'] ?? 'Erro ao cadastrar';
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(erro), backgroundColor: Colors.red));
-      } finally {
-        if (mounted) setState(() => _carregando = false);
+      final response = await dio.post(
+        'signup',
+        data: {
+          'email': _emailController.text.trim(),
+          'password': _senhaController.text.trim(),
+          'name': _nomeController.text.trim(),
+          'role': 'aluno',
+        },
+      );
+
+      if (response.statusCode == 201) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Conta criada!')));
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
       }
+    } on DioException catch (e) {
+      String erro = e.response?.data['error'] ?? 'Erro ao cadastrar';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(erro), backgroundColor: Colors.red),
+      );
+    } finally {
+      if (mounted) setState(() => _carregando = false);
+    }
   }
 
   @override
@@ -135,18 +130,6 @@ class _CadastroPageState extends State<CadastroPage> {
                     controller: _nomeController,
                     hintText: 'Insira seu nome...',
                   ),
-                  const SizedBox(height: 15),
-
-                  const Text(
-                    'Selecione seu perfil:',
-                    style: TextStyle(
-                      color: Color(0xFF333333),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _construirCampoSelect(),
                   const SizedBox(height: 15),
 
                   const Text(
@@ -207,7 +190,9 @@ class _CadastroPageState extends State<CadastroPage> {
                     obscureText: _ocultarConfirmacaoSenha,
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _ocultarConfirmacaoSenha ? Icons.visibility_off : Icons.visibility,
+                        _ocultarConfirmacaoSenha
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                         color: const Color(0xFF623FBD),
                       ),
                       onPressed: () {
@@ -222,7 +207,7 @@ class _CadastroPageState extends State<CadastroPage> {
                   Center(
                     child: GestureDetector(
                       onTap: () {},
-                      child:  Text.rich(
+                      child: Text.rich(
                         TextSpan(
                           text: 'Já possui conta? ',
                           style: TextStyle(
@@ -238,7 +223,10 @@ class _CadastroPageState extends State<CadastroPage> {
                                 decoration: TextDecoration.underline,
                               ),
                               recognizer: TapGestureRecognizer()
-                                ..onTap = () => Navigator.pushReplacementNamed(context, '/login'),
+                                ..onTap = () => Navigator.pushReplacementNamed(
+                                  context,
+                                  '/login',
+                                ),
                             ),
                           ],
                         ),
@@ -284,48 +272,6 @@ class _CadastroPageState extends State<CadastroPage> {
     );
   }
 
-  Widget _construirCampoSelect() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(25),
-        boxShadow: [
-          BoxShadow(
-            color: const Color.fromARGB(91, 106, 94, 94),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: _perfilSelecionado,
-          hint: const Text(
-            'Escolha uma opção...',
-            style: TextStyle(color: Colors.black26, fontSize: 15),
-          ),
-          isExpanded: true,
-          icon: const Icon(
-            Icons.arrow_drop_down,
-            color: Color(0xFF623FBD),
-            size: 30,
-          ),
-          style: const TextStyle(color: Colors.black, fontSize: 16),
-          borderRadius: BorderRadius.circular(20),
-          onChanged: (String? novoValor) {
-            setState(() {
-              _perfilSelecionado = novoValor;
-            });
-          },
-          items: _opcoesPerfil.map<DropdownMenuItem<String>>((String valor) {
-            return DropdownMenuItem<String>(value: valor, child: Text(valor));
-          }).toList(),
-        ),
-      ),
-    );
-  }
 
   Widget _construirCampoTexto({
     required TextEditingController controller,
