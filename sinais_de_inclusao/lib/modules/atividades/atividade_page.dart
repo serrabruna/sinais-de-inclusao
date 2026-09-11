@@ -28,7 +28,6 @@ class _AtividadePageState extends State<AtividadePage> {
   String? _alternativaSelecionada;
   bool _enviando = false;
 
-  
   @override
   void didUpdateWidget(covariant AtividadePage oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -51,8 +50,9 @@ class _AtividadePageState extends State<AtividadePage> {
 
     try {
       final dio = await DioClient.getInstance();
-      final response = await dio.post('/answer', 
-        data: {'sign_id': widget.idQuestao, 'user_answer': resposta}
+      final response = await dio.post(
+        '/answer',
+        data: {'sign_id': widget.idQuestao, 'user_answer': resposta},
       );
 
       final String mensagem = response.data['message']?.toString() ?? "";
@@ -70,19 +70,19 @@ class _AtividadePageState extends State<AtividadePage> {
           const SnackBar(
             content: Text('Correto! +10 XP'),
             backgroundColor: Colors.green,
-            duration: Duration(seconds: 1), 
+            duration: Duration(seconds: 1),
           ),
         );
         Future.delayed(const Duration(seconds: 1), () {
           if (mounted) {
-            ScaffoldMessenger.of(context).clearSnackBars(); 
+            ScaffoldMessenger.of(context).clearSnackBars();
             widget.onFinalizado(10);
           }
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Resposta errada, tente novamente!'),
+            content: Text('Resposta incorreta!'),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 1),
           ),
@@ -91,10 +91,7 @@ class _AtividadePageState extends State<AtividadePage> {
         Future.delayed(const Duration(seconds: 1), () {
           if (mounted) {
             ScaffoldMessenger.of(context).clearSnackBars();
-            setState(() {
-              _alternativaSelecionada = null;
-              _foiCorreto = null;
-            });
+            widget.onFinalizado(0); 
           }
         });
       }
@@ -138,7 +135,10 @@ class _AtividadePageState extends State<AtividadePage> {
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(20)),
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                     child: Row(
                       children: const [
                         Text('XP +10', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -152,17 +152,28 @@ class _AtividadePageState extends State<AtividadePage> {
               const SizedBox(height: 30),
               Center(
                 child: Container(
-                  width: 250, height: 250,
-                  decoration: BoxDecoration(color: const Color(0xFFF3F1FA), borderRadius: BorderRadius.circular(40)),
+                  width: 250,
+                  height: 250,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF3F1FA),
+                    borderRadius: BorderRadius.circular(40),
+                  ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(25),
-                    child: Image.network(widget.urlMidia, fit: BoxFit.contain, 
-                      errorBuilder: (c, e, s) => Image.asset('assets/images/logocirculo.png')),
+                    child: Image.network(
+                      widget.urlMidia,
+                      fit: BoxFit.contain,
+                      errorBuilder: (c, e, s) => Image.asset('assets/images/logocirculo.png'),
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 30),
-              Text(widget.enunciado, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+              Text(
+                widget.enunciado,
+                style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 30),
               Expanded(
                 child: ListView(
@@ -177,7 +188,10 @@ class _AtividadePageState extends State<AtividadePage> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                           padding: const EdgeInsets.symmetric(vertical: 20),
                         ),
-                        child: Text(alternativa, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                        child: Text(
+                          alternativa,
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                        ),
                       ),
                     );
                   }).toList(),
