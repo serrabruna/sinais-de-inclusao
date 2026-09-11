@@ -51,7 +51,7 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
     }
   }
 
-void _exibirModalParabens() {
+  void _exibirModalParabens() {
     final int total = widget.questoes.length;
     final double taxa = total > 0 ? (_acertos / total) : 0;
 
@@ -70,15 +70,15 @@ void _exibirModalParabens() {
     } else if (taxa >= 0.8) {
       estrelas = 3;
       labelMedalha = '3 Estrelas de Ouro';
-      corMedalha = const Color(0xFFFFD700); // Ouro
+      corMedalha = const Color(0xFFFFD700); 
     } else if (taxa >= 0.5) {
       estrelas = 2;
       labelMedalha = '2 Estrelas de Prata';
-      corMedalha = const Color(0xFFC0C0C0); // Prata
+      corMedalha = const Color(0xFFC0C0C0); 
     } else {
       estrelas = 1;
       labelMedalha = '1 Estrela de Bronze';
-      corMedalha = const Color(0xFFCD7F32); // Bronze
+      corMedalha = const Color(0xFFCD7F32); 
     }
 
     showDialog(
@@ -195,19 +195,79 @@ void _exibirModalParabens() {
   @override
   Widget build(BuildContext context) {
     if (widget.questoes.isEmpty || _currentIndex >= widget.questoes.length) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        backgroundColor: Color(0xFF623FBD),
+        body: Center(
+          child: CircularProgressIndicator(color: Colors.white),
+        ),
+      );
     }
 
+    final double progresso = widget.questoes.isNotEmpty
+        ? (_currentIndex + 1) / widget.questoes.length
+        : 0.0;
+
     final q = widget.questoes[_currentIndex];
-    return AtividadePage(
-      idQuestao: (q['id'] ?? 0).toInt(),
-      enunciado: (q['statement'] ?? 'Sem enunciado').toString(),
-      urlMidia: (q['image_path'] ?? '').toString(),
-      alternativas: q['options'] != null
-          ? List<String>.from(q['options'])
-          : [],
-      alternativaCorreta: (q['correct_answer'] ?? '').toString(),
-      onFinalizado: _irParaProxima,
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF623FBD),
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: TweenAnimationBuilder<double>(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        tween: Tween<double>(
+                          begin: 0,
+                          end: progresso,
+                        ),
+                        builder: (context, value, _) => LinearProgressIndicator(
+                          value: value,
+                          minHeight: 10,
+                          backgroundColor: Colors.white24,
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            Color(0xFF58CC02),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    '${_currentIndex + 1}/${widget.questoes.length}',
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: AtividadePage(
+                key: ValueKey((q['id'] ?? _currentIndex)),
+                idQuestao: (q['id'] ?? 0).toInt(),
+                enunciado: (q['statement'] ?? 'Sem enunciado').toString(),
+                urlMidia: (q['image_path'] ?? '').toString(),
+                alternativas: q['options'] != null
+                    ? List<String>.from(q['options'])
+                    : [],
+                alternativaCorreta: (q['correct_answer'] ?? '').toString(),
+                onFinalizado: _irParaProxima,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
