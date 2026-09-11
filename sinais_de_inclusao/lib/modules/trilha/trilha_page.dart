@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sinais_de_inclusao/classes/icon_mapper.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/modules/favoritos/favoritos_page.dart';
+import 'package:sinais_de_inclusao/service/streak_service.dart';
 import 'package:sinais_de_inclusao/widgets/flow_atividades_page.dart';
 
 class TrilhaPage extends StatefulWidget {
@@ -19,12 +20,26 @@ class _TrilhaPageState extends State<TrilhaPage> {
 
   Map<int, int> _estrelasPorCategoria = {};
 
+  int _streak = 0;
+  bool _ativoHoje = false;
+
   @override
   void initState() {
     super.initState();
     _categoriasFuture = _fetchCategorias();
     _fetchXP();
     _carregarEstrelasSalvas();
+    _carregarEsquenta();
+  }
+
+  Future<void> _carregarEsquenta() async {
+    final status = await StreakService.obterStatusEsquenta();
+    if (mounted) {
+      setState(() {
+        _streak = status['streak'] ?? 0;
+        _ativoHoje = status['ativoHoje'] ?? false;
+      });
+    }
   }
 
   Future<void> _carregarEstrelasSalvas() async {
@@ -115,6 +130,8 @@ class _TrilhaPageState extends State<TrilhaPage> {
         } else {
           _fetchXP();
         }
+
+        _carregarEsquenta();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -130,11 +147,11 @@ class _TrilhaPageState extends State<TrilhaPage> {
   Color _obterCorEstrela(int estrelas) {
     switch (estrelas) {
       case 3:
-        return const Color(0xFFFFD700); // Ouro
+        return const Color(0xFFFFD700); 
       case 2:
-        return const Color(0xFFC0C0C0); // Prata
+        return const Color(0xFFC0C0C0); 
       case 1:
-        return const Color(0xFFCD7F32); // Bronze
+        return const Color(0xFFCD7F32); 
       default:
         return Colors.white24;
     }
@@ -306,26 +323,63 @@ class _TrilhaPageState extends State<TrilhaPage> {
                   icon: const Icon(Icons.close, color: Colors.white70, size: 30),
                   onPressed: () => Navigator.pop(context),
                 ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white24,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    children: [
-                      Text(
-                        '$_xpTotal ',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
                       ),
-                      const Icon(Icons.star, color: Colors.amber, size: 22),
-                    ],
-                  ),
+                      decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.local_fire_department,
+                            color: _ativoHoje
+                                ? Colors.deepOrangeAccent
+                                : Colors.white38,
+                            size: 22,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '$_streak',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            '$_xpTotal ',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                          const Icon(Icons.star, color: Colors.amber, size: 22),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
