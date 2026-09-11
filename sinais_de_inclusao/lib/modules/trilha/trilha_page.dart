@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sinais_de_inclusao/classes/icon_mapper.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
+import 'package:sinais_de_inclusao/modules/favoritos/favoritos_page.dart';
 import 'package:sinais_de_inclusao/widgets/flow_atividades_page.dart';
 
 class TrilhaPage extends StatefulWidget {
@@ -15,11 +17,45 @@ class _TrilhaPageState extends State<TrilhaPage> {
   late Future<List<dynamic>> _categoriasFuture;
   bool _isLoadingXp = true;
 
+  Map<int, int> _estrelasPorCategoria = {};
+
   @override
   void initState() {
     super.initState();
     _categoriasFuture = _fetchCategorias();
     _fetchXP();
+    _carregarEstrelasSalvas();
+  }
+
+  Future<void> _carregarEstrelasSalvas() async {
+    final prefs = await SharedPreferences.getInstance();
+    final Map<int, int> mapa = {};
+    for (String key in prefs.getKeys()) {
+      if (key.startsWith('estrelas_categoria_')) {
+        final id = int.tryParse(key.replaceFirst('estrelas_categoria_', ''));
+        if (id != null) {
+          mapa[id] = prefs.getInt(key) ?? 0;
+        }
+      }
+    }
+    if (mounted) {
+      setState(() {
+        _estrelasPorCategoria = mapa;
+      });
+    }
+  }
+
+  Future<void> _salvarEstrelas(int idCategoria, int estrelas) async {
+    final prefs = await SharedPreferences.getInstance();
+    final antigas = prefs.getInt('estrelas_categoria_$idCategoria') ?? 0;
+    if (estrelas > antigas) {
+      await prefs.setInt('estrelas_categoria_$idCategoria', estrelas);
+      if (mounted) {
+        setState(() {
+          _estrelasPorCategoria[idCategoria] = estrelas;
+        });
+      }
+    }
   }
 
   Future<List<dynamic>> _fetchCategorias() async {
@@ -49,24 +85,33 @@ class _TrilhaPageState extends State<TrilhaPage> {
     try {
       final dio = await DioClient.getInstance();
       final response = await dio.get('/categories/$idCategoria/signs');
-      final List<dynamic> questoes = (response.data is List)
-          ? response.data
-          : [];
+      final List<dynamic> questoes =
+          (response.data is List) ? response.data : [];
 
       if (questoes.isNotEmpty) {
         if (!mounted) return;
 
-        final novoXp = await Navigator.push<int>(
+        final dynamic resultado = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => FlowAtividadesPage(questoes: questoes),
           ),
         );
 
-        if (novoXp != null) {
-          setState(() {
-            _xpTotal = novoXp;
-          });
+        if (resultado != null) {
+          if (resultado is Map) {
+            final novoXp = resultado['xp'] as int?;
+            final estrelas = resultado['estrelas'] as int?;
+
+            if (novoXp != null) {
+              setState(() => _xpTotal = novoXp);
+            }
+            if (estrelas != null) {
+              await _salvarEstrelas(idCategoria, estrelas);
+            }
+          } else if (resultado is int) {
+            setState(() => _xpTotal = resultado);
+          }
         } else {
           _fetchXP();
         }
@@ -79,6 +124,19 @@ class _TrilhaPageState extends State<TrilhaPage> {
       }
     } catch (e) {
       debugPrint("Erro ao carregar sinais: $e");
+    }
+  }
+
+  Color _obterCorEstrela(int estrelas) {
+    switch (estrelas) {
+      case 3:
+        return const Color(0xFFFFD700); // Ouro
+      case 2:
+        return const Color(0xFFC0C0C0); // Prata
+      case 1:
+        return const Color(0xFFCD7F32); // Bronze
+      default:
+        return Colors.white24;
     }
   }
 
@@ -146,6 +204,8 @@ class _TrilhaPageState extends State<TrilhaPage> {
     final String nome = (categoria['name'] ?? 'Desconhecido').toString();
     final int id = (categoria['id'] ?? 0).toInt();
     final bool estaLiberado = _xpTotal >= (index * 100);
+    final int estrelasConquistadas = _estrelasPorCategoria[id] ?? 0;
+    final Color corEstrelas = _obterCorEstrela(estrelasConquistadas);
 
     return AlignmentPlatform(
       alignment: Alignment(bias, 0.0),
@@ -157,10 +217,10 @@ class _TrilhaPageState extends State<TrilhaPage> {
             onTap: estaLiberado
                 ? () => _iniciarTrilha(id)
                 : () => ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Bloqueado! Complete níveis anteriores.'),
+                      const SnackBar(
+                        content: Text('Bloqueado! Complete níveis anteriores.'),
+                      ),
                     ),
-                  ),
             child: Column(
               children: [
                 Stack(
@@ -202,9 +262,26 @@ class _TrilhaPageState extends State<TrilhaPage> {
                       ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
+                if (estaLiberado && estrelasConquistadas > 0)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(3, (starIdx) {
+                        return Icon(
+                          Icons.star_rounded,
+                          size: 20,
+                          color: starIdx < estrelasConquistadas
+                              ? corEstrelas
+                              : Colors.white30,
+                        );
+                      }),
+                    ),
+                  ),
                 Text(
                   nome,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -224,29 +301,47 @@ class _TrilhaPageState extends State<TrilhaPage> {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
           children: [
-            IconButton(
-              icon: const Icon(Icons.close, color: Colors.white70, size: 30),
-              onPressed: () => Navigator.pop(context),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white24,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    '$_xpTotal ',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white70, size: 30),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white24,
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  const Icon(Icons.star, color: Colors.amber, size: 22),
-                ],
+                  child: Row(
+                    children: [
+                      Text(
+                        '$_xpTotal ',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const Icon(Icons.star, color: Colors.amber, size: 22),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "Faça 100 pontos para desbloquear um novo nível",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -299,10 +394,40 @@ class _TrilhaPageState extends State<TrilhaPage> {
           onPressed: () {
             Navigator.pushReplacementNamed(context, '/favoritos');
           },
+      );
+
+  Widget _buildFooter() => Container(
+        height: 80,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
         ),
-      ],
-    ),
-  );
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.home, color: Color(0xFF623FBD), size: 32),
+              onPressed: () {},
+            ),
+            Image.asset('assets/images/logocirculo.png', height: 50),
+            IconButton(
+              icon: const Icon(
+                Icons.bookmark_border,
+                color: Color(0xFF623FBD),
+                size: 32,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const FavoritosPage(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      );
 }
 
 class AlignmentPlatform extends StatelessWidget {
@@ -313,9 +438,10 @@ class AlignmentPlatform extends StatelessWidget {
     required this.alignment,
     required this.child,
   });
+
   @override
   Widget build(BuildContext context) => Align(
-    alignment: alignment,
-    child: SizedBox(width: 140, child: child),
-  );
+        alignment: alignment,
+        child: SizedBox(width: 140, child: child),
+      );
 }

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-//importa o pacote Shared , usado para salvar e ler dados simples diretamente no armazenamento interno do celular - nesse casso a utenticação do usuario
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
-  //implementaa o PreferredSizeWidget - exigido pra appbar no flutter
   const CustomAppBar({super.key});
 
   @override
@@ -11,31 +9,23 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => const Size.fromHeight(100);
-  //sobrescreve o metodo obg PreferredSizeWidget, define a altura da barrra com 100 px
 }
 
 class _CustomAppBarState extends State<CustomAppBar> {
-  bool _autenticado = false; //cmc como falsa, ve se o usuario esta logado ou nao
+  bool _autenticado = false;
 
   @override
   void initState() {
     super.initState();
     _verificarAutenticacao();
   }
-  //sobrescreve o ciclo de vida initStatt, checa o login imediatamente
 
   Future<void> _verificarAutenticacao() async {
-    //funcao assincrona de verificar a autentificacao
     final prefs = await SharedPreferences.getInstance();
-    //instancia a shared Preferences
-
     final token = prefs.getString('token');
-    //tenta ler uma string chamada token
 
     if (mounted) {
-      //se ainda esta no app, aberto, evitar erros
       setState(() {
-        //chama o setState, e muda o autenticado para vdd se o token nao for nulo e nao estiver vazio
         _autenticado = token != null && token.isNotEmpty;
       });
     }
@@ -47,13 +37,54 @@ class _CustomAppBarState extends State<CustomAppBar> {
       toolbarHeight: 100,
       //altura interna 100px
       backgroundColor:const Color(0xFF623FBD),
+      backgroundColor: const Color(0xFF623FBD),
       elevation: 0,
-
       title: Image.asset('assets/images/logocirculo.png', height: 70),
 
 
+      actions: [
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.menu, color: Colors.white, size: 35),
+          onSelected: (value) async {
+            if (value == 'temaPs') {
+              Navigator.pushNamed(context, '/temas');
+            } else if (value == 'logout') {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.remove('token');
+              await prefs.remove('role');
+
+              if (context.mounted) {
+                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+              }
+            }
+          },
+          itemBuilder: (BuildContext context) => [
+            if (_autenticado)
+              const PopupMenuItem<String>(
+                value: 'temas',
+                child: Row(
+                  children: [
+                    Icon(Icons.menu_book, color: Color(0xFF623FBD)),
+                    SizedBox(width: 10),
+                    Text("Temas"),
+                  ],
+                ),
+              ),
+            const PopupMenuItem<String>(
+              value: 'logout',
+              child: Row(
+                children: [
+                  Icon(Icons.logout, color: Colors.red),
+                  SizedBox(width: 10),
+                  Text("Sair"),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(width: 10),
+      ],
       automaticallyImplyLeading: false,
-      //esconde o menu automatico
     );
   }
 }

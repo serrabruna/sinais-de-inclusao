@@ -83,7 +83,7 @@ class _AtividadePageState extends State<AtividadePage> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Resposta errada, tente novamente!'),
+            content: Text('Resposta incorreta!'),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 1),
           ),
@@ -92,10 +92,7 @@ class _AtividadePageState extends State<AtividadePage> {
         Future.delayed(const Duration(seconds: 1), () {
           if (mounted) {
             ScaffoldMessenger.of(context).clearSnackBars();
-            setState(() {
-              _alternativaSelecionada = null;
-              _foiCorreto = null;
-            });
+            widget.onFinalizado(0); 
           }
         });
       }

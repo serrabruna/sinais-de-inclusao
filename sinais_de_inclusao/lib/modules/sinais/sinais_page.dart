@@ -186,7 +186,7 @@ class _SinaisPageState extends State<SinaisPage> {
       ),
     );
   }
-
+  
   Widget _buildCardSinal(dynamic sinal) {
     final int signId = sinal['id'];
     final bool favoritado = _favoritosIds.contains(signId);
