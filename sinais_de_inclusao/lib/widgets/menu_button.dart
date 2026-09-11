@@ -28,8 +28,22 @@ class MenuButton extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icone, size: 50, color: const Color(0xFF623FBD)),
-          Text(titulo, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Icon(
+            icone,
+            size: 45,
+            color: const Color(0xFF623FBD),
+          ),
+
+          const SizedBox(height: 8),
+
+          Text(
+            titulo,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
         ],
       ),
     );

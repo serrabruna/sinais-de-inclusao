@@ -56,7 +56,8 @@ class _AtividadePageState extends State<AtividadePage> {
       );
 
       final String mensagem = response.data['message']?.toString() ?? "";
-      final bool acertou = mensagem.contains("Parabéns") || mensagem.contains("acertou");
+      final bool acertou =
+          mensagem.contains("Parabéns") || mensagem.contains("acertou");
 
       setState(() {
         _foiCorreto = acertou;
@@ -130,18 +131,31 @@ class _AtividadePageState extends State<AtividadePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white70, size: 30),
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white70,
+                      size: 30,
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white24,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
                       children: const [
-                        Text('XP +10', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        Text(
+                          'XP +10',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         SizedBox(width: 5),
                         Icon(Icons.star, color: Colors.amber, size: 20),
                       ],
@@ -163,7 +177,8 @@ class _AtividadePageState extends State<AtividadePage> {
                     child: Image.network(
                       widget.urlMidia,
                       fit: BoxFit.contain,
-                      errorBuilder: (c, e, s) => Image.asset('assets/images/logocirculo.png'),
+                      errorBuilder: (c, e, s) =>
+                          Image.asset('assets/images/logocirculo.png'),
                     ),
                   ),
                 ),
@@ -171,7 +186,11 @@ class _AtividadePageState extends State<AtividadePage> {
               const SizedBox(height: 30),
               Text(
                 widget.enunciado,
-                style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 30),
@@ -179,18 +198,36 @@ class _AtividadePageState extends State<AtividadePage> {
                 child: ListView(
                   children: widget.alternativas.map((alternativa) {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: ElevatedButton(
-                        onPressed: () => _verificarResposta(alternativa),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _obterCorBotao(alternativa),
-                          foregroundColor: _obterCorTextoBotao(alternativa),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                        ),
-                        child: Text(
-                          alternativa,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 20,
+                      ),
+                      child: SizedBox(
+                        height: 55,
+                        child: ElevatedButton(
+                          onPressed: () => _verificarResposta(alternativa),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _obterCorBotao(alternativa),
+                            foregroundColor: _obterCorTextoBotao(alternativa),
+
+                            // sombra
+                            elevation: 3,
+                            shadowColor: Colors.black26,
+
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                          ),
+                          child: Text(
+                            alternativa,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
                       ),
                     );
