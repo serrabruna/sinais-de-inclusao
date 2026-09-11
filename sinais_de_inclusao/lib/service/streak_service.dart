@@ -1,62 +1,57 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sinais_de_inclusao/http/dio_client.dart';
 
 class StreakService {
   static const String _keyStreak = 'esquenta_streak';
-  static const String _keyLastDate = 'esquenta_last_date';
-  
+  static const String _keyAtivoHoje = 'esquenta_ativo_hoje';
+
   static Future<Map<String, dynamic>> obterStatusEsquenta() async {
     final prefs = await SharedPreferences.getInstance();
-    final int streak = prefs.getInt(_keyStreak) ?? 0;
-    final String? lastDateStr = prefs.getString(_keyLastDate);
 
-    if (lastDateStr == null) {
-      return {'streak': 0, 'ativoHoje': false};
+    try {
+      final dio = await DioClient.getInstance();
+      final response = await dio.get('user/profile');
+
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data;
+        final int streak = (data['streak'] ?? 0) as int;
+        final bool ativoHoje = (data['streakActiveToday'] ?? false) as bool;
+
+        await prefs.setInt(_keyStreak, streak);
+        await prefs.setBool(_keyAtivoHoje, ativoHoje);
+
+        return {'streak': streak, 'ativoHoje': ativoHoje};
+      }
+    } catch (e) {
+      debugPrint("Aviso: Erro ao buscar streak do backend, usando cache local: $e");
     }
-
-    final DateTime lastDate = DateTime.parse(lastDateStr);
-    final DateTime now = DateTime.now();
-
-    final DateTime dataUltima = DateTime(lastDate.year, lastDate.month, lastDate.day);
-    final DateTime dataHoje = DateTime(now.year, now.month, now.day);
-    final int diff = dataHoje.difference(dataUltima).inDays;
-
-    if (diff == 0) {
-      return {'streak': streak, 'ativoHoje': true};
-    } else if (diff == 1) {
-      return {'streak': streak, 'ativoHoje': false};
-    } else {
-      await prefs.setInt(_keyStreak, 0);
-      return {'streak': 0, 'ativoHoje': false};
-    }
+    return {
+      'streak': prefs.getInt(_keyStreak) ?? 0,
+      'ativoHoje': prefs.getBool(_keyAtivoHoje) ?? false,
+    };
   }
 
   static Future<int> registrarTreinoConcluido() async {
     final prefs = await SharedPreferences.getInstance();
-    final int streakAtual = prefs.getInt(_keyStreak) ?? 0;
-    final String? lastDateStr = prefs.getString(_keyLastDate);
-    final DateTime now = DateTime.now();
 
-    if (lastDateStr != null) {
-      final DateTime lastDate = DateTime.parse(lastDateStr);
-      final DateTime dataUltima = DateTime(lastDate.year, lastDate.month, lastDate.day);
-      final DateTime dataHoje = DateTime(now.year, now.month, now.day);
-      final int diff = dataHoje.difference(dataUltima).inDays;
+    try {
+      final dio = await DioClient.getInstance();
+      final response = await dio.post('user/streak');
 
-      if (diff == 0) {
-        
-        return streakAtual;
-      } else if (diff == 1) {
-        
-        final novoStreak = streakAtual + 1;
-        await prefs.setInt(_keyStreak, novoStreak);
-        await prefs.setString(_keyLastDate, now.toIso8601String());
-        return novoStreak;
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data;
+        final int streak = (data['streak'] ?? 1) as int;
+        final bool ativoHoje = (data['activeToday'] ?? true) as bool;
+
+        await prefs.setInt(_keyStreak, streak);
+        await prefs.setBool(_keyAtivoHoje, ativoHoje);
+
+        return streak;
       }
+    } catch (e) {
+      debugPrint("Erro ao registrar treino no backend: $e");
     }
-
-    const novoStreak = 1;
-    await prefs.setInt(_keyStreak, novoStreak);
-    await prefs.setString(_keyLastDate, now.toIso8601String());
-    return novoStreak;
+    return prefs.getInt(_keyStreak) ?? 1;
   }
 }
