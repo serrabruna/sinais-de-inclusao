@@ -26,8 +26,9 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
       final dio = await DioClient.getInstance();
       final response = await dio.get('/user/xp');
       if (mounted) {
+        //mounted p nao dar nenhum tipo de erro
         setState(() {
-          _xpTotalNoFluxo = (response.data['xp'] ?? 0).toInt();
+          _xpTotalNoFluxo = (response.data['xp'] ?? 0).toInt(); //converte o xp em int
         });
       }
     } catch (e) {
@@ -45,6 +46,7 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
 
     if (_currentIndex < widget.questoes.length - 1) {
       setState(() => _currentIndex++);
+      //muda a questão se ele nao tiver terminado
     } else {
       _exibirModalParabens();
     }
@@ -192,7 +194,8 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
     if (widget.questoes.isEmpty || _currentIndex >= widget.questoes.length) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-
+    //verificacao, se a lista de questoes estiver vazia ou o indice estourar exibe uma barra de carregamento
+    
     final q = widget.questoes[_currentIndex];
     return AtividadePage(
       idQuestao: (q['id'] ?? 0).toInt(),
