@@ -148,7 +148,10 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
                   ),
                   onPressed: () {
                     Navigator.pop(ctx);
-                    Navigator.pop(context, _xpTotalNoFluxo);
+                    Navigator.pop(context, {
+                      'xp': _xpTotalNoFluxo,
+                      'estrelas': estrelas,
+                    });
                   },
                   child: const Text(
                     'Concluir',

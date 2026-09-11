@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sinais_de_inclusao/classes/icon_mapper.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/widgets/flow_atividades_page.dart';
@@ -15,11 +16,47 @@ class _TrilhaPageState extends State<TrilhaPage> {
   late Future<List<dynamic>> _categoriasFuture;
   bool _isLoadingXp = true;
 
+  
+  Map<int, int> _estrelasPorCategoria = {};
+
   @override
   void initState() {
     super.initState();
     _categoriasFuture = _fetchCategorias();
     _fetchXP();
+    _carregarEstrelasSalvas();
+  }
+
+  Future<void> _carregarEstrelasSalvas() async {
+    final prefs = await SharedPreferences.getInstance();
+    final Map<int, int> mapa = {};
+    for (String key in prefs.getKeys()) {
+      if (key.startsWith('estrelas_categoria_')) {
+        final id = int.tryParse(key.replaceFirst('estrelas_categoria_', ''));
+        if (id != null) {
+          mapa[id] = prefs.getInt(key) ?? 0;
+        }
+      }
+    }
+    if (mounted) {
+      setState(() {
+        _estrelasPorCategoria = mapa;
+      });
+    }
+  }
+
+  Future<void> _salvarEstrelas(int idCategoria, int estrelas) async {
+    final prefs = await SharedPreferences.getInstance();
+    
+    final antigas = prefs.getInt('estrelas_categoria_$idCategoria') ?? 0;
+    if (estrelas > antigas) {
+      await prefs.setInt('estrelas_categoria_$idCategoria', estrelas);
+      if (mounted) {
+        setState(() {
+          _estrelasPorCategoria[idCategoria] = estrelas;
+        });
+      }
+    }
   }
 
   Future<List<dynamic>> _fetchCategorias() async {
@@ -56,17 +93,27 @@ class _TrilhaPageState extends State<TrilhaPage> {
       if (questoes.isNotEmpty) {
         if (!mounted) return;
 
-        final novoXp = await Navigator.push<int>(
+        final dynamic resultado = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => FlowAtividadesPage(questoes: questoes),
           ),
         );
 
-        if (novoXp != null) {
-          setState(() {
-            _xpTotal = novoXp;
-          });
+        if (resultado != null) {
+          if (resultado is Map) {
+            final novoXp = resultado['xp'] as int?;
+            final estrelas = resultado['estrelas'] as int?;
+
+            if (novoXp != null) {
+              setState(() => _xpTotal = novoXp);
+            }
+            if (estrelas != null) {
+              await _salvarEstrelas(idCategoria, estrelas);
+            }
+          } else if (resultado is int) {
+            setState(() => _xpTotal = resultado);
+          }
         } else {
           _fetchXP();
         }
@@ -79,6 +126,19 @@ class _TrilhaPageState extends State<TrilhaPage> {
       }
     } catch (e) {
       debugPrint("Erro ao carregar sinais: $e");
+    }
+  }
+
+  Color _obterCorEstrela(int estrelas) {
+    switch (estrelas) {
+      case 3:
+        return const Color(0xFFFFD700); 
+      case 2:
+        return const Color(0xFFC0C0C0); 
+      case 1:
+        return const Color(0xFFCD7F32); 
+      default:
+        return Colors.white24;
     }
   }
 
@@ -146,6 +206,8 @@ class _TrilhaPageState extends State<TrilhaPage> {
     final String nome = (categoria['name'] ?? 'Desconhecido').toString();
     final int id = (categoria['id'] ?? 0).toInt();
     final bool estaLiberado = _xpTotal >= (index * 100);
+    final int estrelasConquistadas = _estrelasPorCategoria[id] ?? 0;
+    final Color corEstrelas = _obterCorEstrela(estrelasConquistadas);
 
     return AlignmentPlatform(
       alignment: Alignment(bias, 0.0),
@@ -202,9 +264,27 @@ class _TrilhaPageState extends State<TrilhaPage> {
                       ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
+                
+                if (estaLiberado && estrelasConquistadas > 0)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(3, (starIdx) {
+                        return Icon(
+                          Icons.star_rounded,
+                          size: 20,
+                          color: starIdx < estrelasConquistadas
+                              ? corEstrelas
+                              : Colors.white30,
+                        );
+                      }),
+                    ),
+                  ),
                 Text(
                   nome,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
