@@ -6,9 +6,8 @@ class FooterWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity, 
-      //esticar para ocupar toda a largura
-      padding: const EdgeInsets.all(18.0),//padding de 18px
+      width: double.infinity,
+      padding: const EdgeInsets.all(18.0),
       color: const Color(0xFFFFB76F),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

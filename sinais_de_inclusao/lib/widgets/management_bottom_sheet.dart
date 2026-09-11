@@ -4,8 +4,6 @@ class ManagementBottomSheet extends StatelessWidget {
   final VoidCallback onCadastrar;
   final VoidCallback onEditar;
   final VoidCallback onExcluir;
-
-  // sao variaevis voidcallback pq sao funcoes que nao retornam nenhum valor, apenas executar uma acao
   const ManagementBottomSheet({super.key, required this.onCadastrar, required this.onEditar, required this.onExcluir});
 
   @override
@@ -21,8 +19,6 @@ class ManagementBottomSheet extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           ListTile(
-            //listtile lista com icone e texto
-            //leadinf- posicionar na extrema esquerda
             leading: const Icon(Icons.add_circle, color: Color(0xFF623FBD)),
             title: const Text("Criar Categoria"),
             onTap: onCadastrar

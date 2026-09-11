@@ -1,30 +1,23 @@
 import 'package:flutter/material.dart';
-//importa o material oficial do flutter -> Sacaffold, Container, Text, ElevatedButton
 import 'package:sinais_de_inclusao/widgets/carousel_images.dart';
 
 class BannerWidget extends StatefulWidget {
   const BannerWidget({super.key});
-  //cria a classe principal do componente chamado BannerWidget
 
   @override
   State<BannerWidget> createState() => _BannerWidgetState();
-  //sobrescreve o metordo createState, conectando com o Banner widget sate
 }
 
 class _BannerWidgetState extends State<BannerWidget> {
   @override
   Widget build(BuildContext context) {
-    //método build, é executado toda vez que o flutter desenha o elemento na tela
     return Container(
       width: double.infinity,
-      //esticar até as bordas laterais do celular
       padding: const EdgeInsets.all(18.0),
-      //suspiro interno de 18px
       color: Color(0xFF7458CF),
       child: SingleChildScrollView(
-        //Permite que o conteudo role verticalmente se a tela do celular for pequena demais
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,//centralizar tudo
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
@@ -42,12 +35,11 @@ class _BannerWidgetState extends State<BannerWidget> {
             SizedBox(height: 26),
             Center(
               child: Column(
-                mainAxisSize: MainAxisSize.min, //ocupar apenas o espaço necessario ps botoes
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pushNamed(context, '/cadastro');
-                      //executa o toque do usuario e chama a rota cadastro
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFEDAD6B),
@@ -76,7 +68,6 @@ class _BannerWidgetState extends State<BannerWidget> {
                   ),
 
                   SizedBox(height: 24),
-                  //renderizacao do carrossel
                   const CarouselImages(),
                 ],
               ),

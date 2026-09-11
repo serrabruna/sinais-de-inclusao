@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
 class FullWidthButton extends StatelessWidget {
-  //steteless pq ele nao atualiza, muda nada, apenas exibe
   final String titulo;
   final IconData icone;
   final VoidCallback onPressed;
-  //função ou ação quanod clicar
+
   const FullWidthButton({
     super.key,
     required this.titulo,
@@ -24,10 +23,8 @@ class FullWidthButton extends StatelessWidget {
           backgroundColor: Colors.white,
           foregroundColor: const Color(0xFF623FBD),
           elevation: 2,
-          //elevation é sombra 
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
-            //altera a borda para um borda crsular 15
           ),
         ),
         icon: Icon(icone),
