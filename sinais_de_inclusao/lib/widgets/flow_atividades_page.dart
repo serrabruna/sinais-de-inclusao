@@ -54,18 +54,30 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
     final int total = widget.questoes.length;
     final double taxa = total > 0 ? (_acertos / total) : 0;
 
-    int estrelas = 1;
-    String tipoMedalha = 'Bronze';
-    Color corMedalha = const Color(0xFFCD7F32); 
+    int estrelas = 0;
+    String titulo = 'Parabéns!';
+    String subtitulo = 'Você concluiu todas as atividades!';
+    String labelMedalha = '';
+    Color corMedalha = Colors.grey[400]!;
 
-    if (taxa >= 0.8) {
+    if (_acertos == 0) {
+      titulo = 'Que pena!';
+      subtitulo = 'Você não acertou nenhuma questão dessa vez.';
+      labelMedalha = 'Tente novamente para ganhar estrelas!';
+      corMedalha = Colors.grey[400]!;
+      estrelas = 0;
+    } else if (taxa >= 0.8) {
       estrelas = 3;
-      tipoMedalha = 'Ouro';
-      corMedalha = const Color(0xFFFFD700); 
+      labelMedalha = '3 Estrelas de Ouro';
+      corMedalha = const Color(0xFFFFD700); // Ouro
     } else if (taxa >= 0.5) {
       estrelas = 2;
-      tipoMedalha = 'Prata';
-      corMedalha = const Color(0xFFC0C0C0); 
+      labelMedalha = '2 Estrelas de Prata';
+      corMedalha = const Color(0xFFC0C0C0); // Prata
+    } else {
+      estrelas = 1;
+      labelMedalha = '1 Estrela de Bronze';
+      corMedalha = const Color(0xFFCD7F32); // Bronze
     }
 
     showDialog(
@@ -78,17 +90,17 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'Parabéns!',
+              Text(
+                titulo,
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF623FBD),
+                  color: _acertos == 0 ? Colors.redAccent : const Color(0xFF623FBD),
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Você concluiu todas as atividades!',
+                subtitulo,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 15, color: Colors.grey[700]),
               ),
@@ -105,11 +117,16 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                '$estrelas ${estrelas == 1 ? "Estrela" : "Estrelas"} de $tipoMedalha',
+                labelMedalha,
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.bold,
-                  color: corMedalha == const Color(0xFFC0C0C0) ? Colors.blueGrey : corMedalha,
+                  color: _acertos == 0
+                      ? Colors.grey[600]
+                      : (corMedalha == const Color(0xFFC0C0C0)
+                          ? Colors.blueGrey
+                          : corMedalha),
                 ),
               ),
               const SizedBox(height: 16),
@@ -153,9 +170,13 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
                       'estrelas': estrelas,
                     });
                   },
-                  child: const Text(
-                    'Concluir',
-                    style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+                  child: Text(
+                    _acertos == 0 ? 'Tentar Novamente' : 'Concluir',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
