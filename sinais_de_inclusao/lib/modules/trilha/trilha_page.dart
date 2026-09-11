@@ -147,11 +147,11 @@ class _TrilhaPageState extends State<TrilhaPage> {
   Color _obterCorEstrela(int estrelas) {
     switch (estrelas) {
       case 3:
-        return const Color(0xFFFFD700); 
+        return const Color(0xFFFFD700);
       case 2:
-        return const Color(0xFFC0C0C0); 
+        return const Color(0xFFC0C0C0);
       case 1:
-        return const Color(0xFFCD7F32); 
+        return const Color(0xFFCD7F32);
       default:
         return Colors.white24;
     }
@@ -269,7 +269,7 @@ class _TrilhaPageState extends State<TrilhaPage> {
                         right: 4,
                         child: CircleAvatar(
                           radius: 12,
-                          backgroundColor:  Color.fromARGB(255, 157, 229, 255),
+                          backgroundColor: Color.fromARGB(255, 157, 229, 255),
                           child: Icon(
                             Icons.lock,
                             color: Color(0xFF623FBD),
@@ -313,11 +313,6 @@ class _TrilhaPageState extends State<TrilhaPage> {
   }
 
   Widget _buildHeader() => Padding(
-    padding: const EdgeInsets.all(20.0),
-    child: Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
@@ -400,54 +395,6 @@ class _TrilhaPageState extends State<TrilhaPage> {
             ),
           ],
         ),
-        const SizedBox(height: 20),
-        const Text(
-          "Faça 100 pontos para desbloquear um novo nível",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.white70,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget _buildFooter() => Container(
-    height: 80,
-    decoration: const BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-    ),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        IconButton(
-          icon: const Icon(Icons.home, color: Color(0xFF623FBD), size: 32),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/temas');
-          },
-        ),
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: const Color.fromARGB(36, 42, 42, 42),
-                blurRadius: 8,
-                spreadRadius: 1,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Image.asset('assets/images/logocirculo.png', height: 50),
-        ),
-        IconButton(
-          icon: const Icon(Icons.favorite, color: Color(0xFF623FBD), size: 32),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/favoritos');
-          },
       );
 
   Widget _buildFooter() => Container(
@@ -461,12 +408,27 @@ class _TrilhaPageState extends State<TrilhaPage> {
           children: [
             IconButton(
               icon: const Icon(Icons.home, color: Color(0xFF623FBD), size: 32),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/temas');
+              },
             ),
-            Image.asset('assets/images/logocirculo.png', height: 50),
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color.fromARGB(36, 42, 42, 42),
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Image.asset('assets/images/logocirculo.png', height: 50),
+            ),
             IconButton(
               icon: const Icon(
-                Icons.bookmark_border,
+                Icons.favorite,
                 color: Color(0xFF623FBD),
                 size: 32,
               ),

@@ -37,7 +37,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
       toolbarHeight: 100,
       //altura interna 100px
       backgroundColor:const Color(0xFF623FBD),
-      backgroundColor: const Color(0xFF623FBD),
       elevation: 0,
       title: Image.asset('assets/images/logocirculo.png', height: 70),
 
