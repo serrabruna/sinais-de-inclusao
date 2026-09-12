@@ -100,9 +100,10 @@ class _TrilhaPageState extends State<TrilhaPage> {
     try {
       final dio = await DioClient.getInstance();
       final response = await dio.get('/categories/$idCategoria/signs');
-      final List<dynamic> questoes =
-          (response.data is List) ? response.data : [];
-
+      final List<dynamic> questoes = (response.data is List)
+          ? response.data
+          : [];
+      await StreakService.registrarTreinoConcluido();
       if (questoes.isNotEmpty) {
         if (!mounted) return;
 
@@ -234,10 +235,10 @@ class _TrilhaPageState extends State<TrilhaPage> {
             onTap: estaLiberado
                 ? () => _iniciarTrilha(id)
                 : () => ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Bloqueado! Complete níveis anteriores.'),
-                      ),
+                    const SnackBar(
+                      content: Text('Bloqueado! Complete níveis anteriores.'),
                     ),
+                  ),
             child: Column(
               children: [
                 Stack(
@@ -313,137 +314,131 @@ class _TrilhaPageState extends State<TrilhaPage> {
   }
 
   Widget _buildHeader() => Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
+    padding: const EdgeInsets.all(20.0),
+    child: Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            IconButton(
+              icon: const Icon(Icons.close, color: Colors.white70, size: 30),
+              onPressed: () => Navigator.pop(context),
+            ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white70, size: 30),
-                  onPressed: () => Navigator.pop(context),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white24,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.local_fire_department,
+                        color: _ativoHoje
+                            ? Colors.deepOrangeAccent
+                            : Colors.white38,
+                        size: 22,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '$_streak',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white24,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        '$_xpTotal ',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.white24,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.local_fire_department,
-                            color: _ativoHoje
-                                ? Colors.deepOrangeAccent
-                                : Colors.white38,
-                            size: 22,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '$_streak',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white24,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            '$_xpTotal ',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                          const Icon(Icons.star, color: Colors.amber, size: 22),
-                        ],
-                      ),
-                    ),
-                  ],
+                      const Icon(Icons.star, color: Colors.amber, size: 22),
+                    ],
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            const Text(
-              "Faça 100 pontos para desbloquear um novo nível",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
           ],
         ),
-      );
+        const SizedBox(height: 20),
+        const Text(
+          "Faça 100 pontos para desbloquear um novo nível",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    ),
+  );
 
   Widget _buildFooter() => Container(
-        height: 80,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+    height: 80,
+    decoration: const BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.home, color: Color(0xFF623FBD), size: 32),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/temas');
+          },
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.home, color: Color(0xFF623FBD), size: 32),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, '/temas');
-              },
-            ),
-            Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color.fromARGB(36, 42, 42, 42),
-                    blurRadius: 8,
-                    spreadRadius: 1,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+        Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: const Color.fromARGB(36, 42, 42, 42),
+                blurRadius: 8,
+                spreadRadius: 1,
+                offset: const Offset(0, 2),
               ),
-              child: Image.asset('assets/images/logocirculo.png', height: 50),
-            ),
-            IconButton(
-              icon: const Icon(
-                Icons.favorite,
-                color: Color(0xFF623FBD),
-                size: 32,
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const FavoritosPage(),
-                  ),
-                );
-              },
-            ),
-          ],
+            ],
+          ),
+          child: Image.asset('assets/images/logocirculo.png', height: 50),
         ),
-      );
+        IconButton(
+          icon: const Icon(Icons.favorite, color: Color(0xFF623FBD), size: 32),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const FavoritosPage()),
+            );
+          },
+        ),
+      ],
+    ),
+  );
 }
 
 class AlignmentPlatform extends StatelessWidget {
@@ -457,7 +452,7 @@ class AlignmentPlatform extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Align(
-        alignment: alignment,
-        child: SizedBox(width: 140, child: child),
-      );
+    alignment: alignment,
+    child: SizedBox(width: 140, child: child),
+  );
 }

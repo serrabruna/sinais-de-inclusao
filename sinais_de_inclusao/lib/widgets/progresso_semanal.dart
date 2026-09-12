@@ -1,44 +1,26 @@
 import 'package:flutter/material.dart';
 
 class ProgressoSemanal extends StatelessWidget {
-  final List<DateTime> diasComAtividade;
+  final List<Map<String, dynamic>> atividadeSemanal;
 
   const ProgressoSemanal({
     super.key,
-    required this.diasComAtividade,
+    required this.atividadeSemanal,
   });
 
-  bool _fezAtividade(DateTime dia) {
-    return diasComAtividade.any(
-      (atividade) =>
-          atividade.year == dia.year &&
-          atividade.month == dia.month &&
-          atividade.day == dia.day,
-    );
-  }
+  static const List<String> nomesDias = [
+    'Dom',
+    'Seg',
+    'Ter',
+    'Qua',
+    'Qui',
+    'Sex',
+    'Sáb',
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final hoje = DateTime.now();
-
-    final inicioSemana = hoje.subtract(
-      Duration(days: hoje.weekday - 1),
-    );
-
-    final diasSemana = List.generate(
-      7,
-      (index) => inicioSemana.add(Duration(days: index)),
-    );
-
-    const nomes = [
-      'Seg',
-      'Ter',
-      'Qua',
-      'Qui',
-      'Sex',
-      'Sáb',
-      'Dom',
-    ];
+    debugPrint('WIDGET RECEBEU: $atividadeSemanal');
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -57,7 +39,6 @@ class ProgressoSemanal extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const Text(
             'Seu progresso',
@@ -67,79 +48,88 @@ class ProgressoSemanal extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-
           const SizedBox(height: 20),
+          if (atividadeSemanal.isEmpty)
+            const Text(
+              'Nenhuma atividade encontrada',
+              style: TextStyle(color: Colors.black45),
+            )
+          else
+            Row(
+              children: List.generate(
+                atividadeSemanal.length,
+                (index) {
+                  final item = atividadeSemanal[index];
+                  final String dataStr = item['date']?.toString() ?? '';
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(7, (index) {
-              final dia = diasSemana[index];
+                  // Checagem flexível de completude (bool, int ou string)
+                  final dynamic val = item['completed'] ?? item['done'] ?? item['active'];
+                  final bool completou = val == true ||
+                      val == 1 ||
+                      val?.toString().toLowerCase() == 'true';
 
-              final fezAtividade = _fezAtividade(dia);
+                  // Obtenção segura do dia e do dia da semana
+                  String numeroDia = '';
+                  String nomeDia = index < nomesDias.length ? nomesDias[index] : '';
 
-              final ehHoje =
-                  dia.year == hoje.year &&
-                  dia.month == hoje.month &&
-                  dia.day == hoje.day;
+                  if (dataStr.contains('-')) {
+                    final partes = dataStr.split('-');
+                    if (partes.length == 3) {
+                      numeroDia = int.tryParse(partes[2])?.toString() ?? partes[2];
+                      final ano = int.tryParse(partes[0]) ?? 2026;
+                      final mes = int.tryParse(partes[1]) ?? 1;
+                      final dia = int.tryParse(partes[2]) ?? 1;
+                      
+                      // DateTime sem timezone para não deslocar dia
+                      final dateObj = DateTime(ano, mes, dia);
+                      nomeDia = nomesDias[dateObj.weekday % 7];
+                    }
+                  }
 
-              return Expanded(
-                child: Column(
-                  children: [
-                    Text(
-                      nomes[index],
-                      style: TextStyle(
-                        color: ehHoje
-                            ? const Color(0xFF623FBD)
-                            : Colors.black54,
-                        fontSize: 13,
-                        fontWeight: ehHoje
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                      ),
-                    ),
+                  debugPrint('RENDER DIA: $dataStr | DIA: $numeroDia | COMPLETADO: $completou');
 
-                    const SizedBox(height: 8),
-
-                    Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: fezAtividade
-                            ? const Color(0xFFFFB46E)
-                            : const Color(0xFFF3F1FA),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: ehHoje
-                              ? const Color(0xFF623FBD)
-                              : Colors.transparent,
-                          width: 2,
+                  return Expanded(
+                    child: Column(
+                      children: [
+                        Text(
+                          nomeDia,
+                          style: const TextStyle(
+                            color: Colors.black54,
+                            fontSize: 13,
+                          ),
                         ),
-                      ),
-                      child: Icon(
-                        fezAtividade
-                            ? Icons.local_fire_department_rounded
-                            : Icons.circle_outlined,
-                        color: fezAtividade
-                            ? Colors.white
-                            : Colors.black12,
-                        size: fezAtividade ? 24 : 18,
-                      ),
+                        const SizedBox(height: 8),
+                        Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            color: completou
+                                ? const Color(0xFFFFB46E)
+                                : const Color(0xFFF3F1FA),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            completou
+                                ? Icons.local_fire_department_rounded
+                                : Icons.circle_outlined,
+                            color: completou ? Colors.white : Colors.black12,
+                            size: completou ? 24 : 18,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          numeroDia,
+                          style: const TextStyle(
+                            color: Colors.black45,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
                     ),
-
-                    const SizedBox(height: 5),
-
-                    Text(
-                      '${dia.day}',
-                      style: const TextStyle(
-                        color: Colors.black45,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-          ),
+                  );
+                },
+              ),
+            ),
         ],
       ),
     );

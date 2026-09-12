@@ -3,7 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/widgets/progresso_semanal.dart';
 import 'package:sinais_de_inclusao/widgets/gradient_background.dart';
-
+import 'package:sinais_de_inclusao/service/streak_service.dart';
+import 'dart:convert'; // Certifique-se de ter esse import no topo da PerfilPage
 class PerfilPage extends StatefulWidget {
   const PerfilPage({super.key});
 
@@ -21,11 +22,11 @@ class _PerfilPageState extends State<PerfilPage> {
   int _xp = 0;
   int _nivel = 0;
   int _streak = 0;
-
+  bool _streakAtivoHoje = false;
+  List<Map<String, dynamic>> _atividadeSemanal = [];
   String _icone = 'face_1';
   int _avatarSelecionado = 0;
 
-  // AVATARES DISPONÍVEIS
   final List<Map<String, dynamic>> avatares = [
     {'nome': 'face_1', 'icone': Icons.face},
     {'nome': 'face_2', 'icone': Icons.face_2},
@@ -36,11 +37,12 @@ class _PerfilPageState extends State<PerfilPage> {
     {'nome': 'smile', 'icone': Icons.sentiment_satisfied_alt},
     {'nome': 'account', 'icone': Icons.account_circle},
   ];
-
   @override
   void initState() {
     super.initState();
+
     _carregarPerfil();
+    _carregarStreak();
   }
 
   Future<void> _carregarPerfil() async {
@@ -59,7 +61,6 @@ class _PerfilPageState extends State<PerfilPage> {
 
         _xp = (data['xp'] ?? 0).toInt();
         _nivel = (data['unlockedLevel'] ?? 0).toInt();
-        _streak = (data['streak'] ?? 0).toInt();
 
         _icone = data['icon']?.toString() ?? 'face_1';
 
@@ -116,7 +117,25 @@ class _PerfilPageState extends State<PerfilPage> {
       }
     }
   }
+Future<void> _carregarStreak() async {
+    try {
+      final status = await StreakService.obterStatusEsquenta();
+      final semana = await StreakService.obterAtividadeSemanal();
 
+      if (!mounted) return;
+
+      setState(() {
+        _streak = status['streak'] ?? 0;
+        _streakAtivoHoje = status['ativoHoje'] ?? false;
+        _atividadeSemanal = semana;
+      });
+
+      debugPrint('STREAK LOCAL: $_streak');
+      debugPrint('ATIVIDADE SEMANAL LOCAL: $_atividadeSemanal');
+    } catch (e) {
+      debugPrint('ERRO AO CARREGAR STREAK LOCAL: $e');
+    }
+  }
   void _selecionarAvatar() {
     showModalBottomSheet(
       context: context,
@@ -138,7 +157,6 @@ class _PerfilPageState extends State<PerfilPage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
               const SizedBox(height: 25),
 
               GridView.builder(
@@ -215,16 +233,14 @@ class _PerfilPageState extends State<PerfilPage> {
       },
     );
   }
+Future<void> _sair() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('token');
 
-  Future<void> _sair() async {
-    final prefs = await SharedPreferences.getInstance();
+  if (!mounted) return;
 
-    await prefs.clear();
-
-    if (!mounted) return;
-
-    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-  }
+  Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+}
 
   @override
   Widget build(BuildContext context) {
@@ -347,17 +363,9 @@ class _PerfilPageState extends State<PerfilPage> {
                       ),
 
                       const SizedBox(height: 30),
-
-                      ProgressoSemanal(
-                        diasComAtividade: [
-                          DateTime(2026, 9, 7),
-                          DateTime(2026, 9, 9),
-                          DateTime(2026, 9, 11),
-                        ],
-                      ),
+                      ProgressoSemanal(atividadeSemanal: _atividadeSemanal),
 
                       const SizedBox(height: 30),
-
                       Container(
                         padding: const EdgeInsets.symmetric(
                           vertical: 20,
