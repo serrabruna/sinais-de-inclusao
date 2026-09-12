@@ -4,7 +4,6 @@ import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/widgets/progresso_semanal.dart';
 import 'package:sinais_de_inclusao/widgets/gradient_background.dart';
 import 'package:sinais_de_inclusao/service/streak_service.dart';
-import 'dart:convert';
 
 class PerfilPage extends StatefulWidget {
   const PerfilPage({super.key});
@@ -38,10 +37,10 @@ class _PerfilPageState extends State<PerfilPage> {
     {'nome': 'smile', 'icone': Icons.sentiment_satisfied_alt},
     {'nome': 'account', 'icone': Icons.account_circle},
   ];
+
   @override
   void initState() {
     super.initState();
-
     _carregarPerfil();
     _carregarStreak();
   }
@@ -49,9 +48,7 @@ class _PerfilPageState extends State<PerfilPage> {
   Future<void> _carregarPerfil() async {
     try {
       final dio = await DioClient.getInstance();
-
       final response = await dio.get('/user/profile');
-
       final data = response.data;
 
       if (!mounted) return;
@@ -59,10 +56,8 @@ class _PerfilPageState extends State<PerfilPage> {
       setState(() {
         _nome = data['name']?.toString() ?? 'Usuário';
         _email = data['email']?.toString() ?? '';
-
         _xp = (data['xp'] ?? 0).toInt();
         _nivel = (data['unlockedLevel'] ?? 0).toInt();
-
         _icone = data['icon']?.toString() ?? 'face_1';
 
         _avatarSelecionado = avatares.indexWhere(
@@ -94,7 +89,6 @@ class _PerfilPageState extends State<PerfilPage> {
       });
 
       final dio = await DioClient.getInstance();
-
       await dio.patch('/user/profile', data: {'name': _nome, 'icon': _icone});
 
       if (!mounted) return;
@@ -118,7 +112,8 @@ class _PerfilPageState extends State<PerfilPage> {
       }
     }
   }
-Future<void> _carregarStreak() async {
+
+  Future<void> _carregarStreak() async {
     try {
       final status = await StreakService.obterStatusEsquenta();
       final semana = await StreakService.obterAtividadeSemanal();
@@ -137,6 +132,7 @@ Future<void> _carregarStreak() async {
       debugPrint('ERRO AO CARREGAR STREAK LOCAL: $e');
     }
   }
+
   void _selecionarAvatar() {
     showModalBottomSheet(
       context: context,
@@ -159,7 +155,6 @@ Future<void> _carregarStreak() async {
                 ),
               ),
               const SizedBox(height: 25),
-
               GridView.builder(
                 shrinkWrap: true,
                 itemCount: avatares.length,
@@ -178,7 +173,6 @@ Future<void> _carregarStreak() async {
 
                       setState(() {
                         _avatarSelecionado = index;
-
                         _icone = avatares[index]['nome'] as String;
                       });
 
@@ -226,7 +220,6 @@ Future<void> _carregarStreak() async {
                   );
                 },
               ),
-
               const SizedBox(height: 10),
             ],
           ),
@@ -234,20 +227,30 @@ Future<void> _carregarStreak() async {
       },
     );
   }
-Future<void> _sair() async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.remove('token');
 
-  if (!mounted) return;
+  Future<void> _sair() async {
+    await StreakService.limparDadosLocais();
 
-  Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-}
+    final prefs = await SharedPreferences.getInstance();
+    final keys = prefs.getKeys();
+
+    for (final key in keys) {
+      if (key == 'token' ||
+          key.startsWith('estrelas_categoria_') ||
+          key.startsWith('esquenta_')) {
+        await prefs.remove(key);
+      }
+    }
+
+    if (!mounted) return;
+
+    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF7458CF),
-
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -258,9 +261,7 @@ Future<void> _sair() async {
         ),
         centerTitle: true,
       ),
-
       extendBodyBehindAppBar: true,
-
       body: GradientBackground(
         child: SafeArea(
           child: _carregando
@@ -315,7 +316,6 @@ Future<void> _sair() async {
                                       color: const Color(0xFF623FBD),
                                     ),
                             ),
-
                             Positioned(
                               bottom: 0,
                               right: 0,
@@ -340,9 +340,7 @@ Future<void> _sair() async {
                           ],
                         ),
                       ),
-
                       const SizedBox(height: 15),
-
                       Text(
                         _nome,
                         textAlign: TextAlign.center,
@@ -352,9 +350,7 @@ Future<void> _sair() async {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
                       const SizedBox(height: 5),
-
                       Text(
                         _email,
                         style: const TextStyle(
@@ -362,10 +358,8 @@ Future<void> _sair() async {
                           fontSize: 15,
                         ),
                       ),
-
                       const SizedBox(height: 30),
                       ProgressoSemanal(atividadeSemanal: _atividadeSemanal),
-
                       const SizedBox(height: 30),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -384,18 +378,14 @@ Future<void> _sair() async {
                               'XP',
                               Colors.amber,
                             ),
-
                             _divisor(),
-
                             _estatistica(
                               Icons.emoji_events_rounded,
                               '$_nivel',
                               'Nível',
                               const Color(0xFF623FBD),
                             ),
-
                             _divisor(),
-
                             _estatistica(
                               Icons.local_fire_department_rounded,
                               '$_streak',
@@ -405,9 +395,7 @@ Future<void> _sair() async {
                           ],
                         ),
                       ),
-
                       const SizedBox(height: 25),
-
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
@@ -417,16 +405,12 @@ Future<void> _sair() async {
                         child: Column(
                           children: [
                             _informacao(Icons.person_outline, 'Nome', _nome),
-
                             const Divider(height: 30),
-
                             _informacao(Icons.email_outlined, 'E-mail', _email),
                           ],
                         ),
                       ),
-
                       const SizedBox(height: 25),
-
                       SizedBox(
                         width: double.infinity,
                         height: 52,
@@ -497,9 +481,7 @@ Future<void> _sair() async {
           ),
           child: Icon(icone, color: const Color(0xFF623FBD), size: 22),
         ),
-
         const SizedBox(width: 15),
-
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -508,9 +490,7 @@ Future<void> _sair() async {
                 titulo,
                 style: const TextStyle(color: Colors.black45, fontSize: 12),
               ),
-
               const SizedBox(height: 2),
-
               Text(
                 valor,
                 style: const TextStyle(

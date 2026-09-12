@@ -26,7 +26,8 @@ class StreakService {
         final data = response.data;
         final int streak = (data['streak'] ?? 0) as int;
         final bool ativoHoje = (data['streakActiveToday'] ?? false) as bool;
-        final List<dynamic> weekly = (data['weeklyActivity'] ?? []) as List<dynamic>;
+        final List<dynamic> weekly =
+            (data['weeklyActivity'] ?? []) as List<dynamic>;
 
         await prefs.setInt(_keyStreak, streak);
         await prefs.setBool(_keyAtivoHoje, ativoHoje);
@@ -39,7 +40,9 @@ class StreakService {
         };
       }
     } catch (e) {
-      debugPrint("Aviso [StreakService]: Falha ao buscar perfil na API, usando cache: $e");
+      debugPrint(
+        "Aviso [StreakService]: Falha ao buscar perfil na API, usando cache: $e",
+      );
     }
 
     final cachedWeeklyStr = prefs.getString(_keyWeeklyActivity);
@@ -57,7 +60,6 @@ class StreakService {
     final prefs = await SharedPreferences.getInstance();
     final DateTime now = DateTime.now();
 
-    
     final String hojeStr = _formatarData(now);
     final List<String> dias = prefs.getStringList(_keyDiasAtividade) ?? [];
     if (!dias.contains(hojeStr)) {
@@ -74,7 +76,8 @@ class StreakService {
         final int streak = (data['streak'] ?? 1) as int;
         final bool ativoHoje = (data['streakActiveToday'] ?? true) as bool;
         final int xp = (data['xp'] ?? 0) as int;
-        final List<dynamic> weekly = (data['weeklyActivity'] ?? []) as List<dynamic>;
+        final List<dynamic> weekly =
+            (data['weeklyActivity'] ?? []) as List<dynamic>;
 
         await prefs.setInt(_keyStreak, streak);
         await prefs.setBool(_keyAtivoHoje, ativoHoje);
@@ -105,13 +108,16 @@ class StreakService {
 
   static Future<List<Map<String, dynamic>>> obterAtividadeSemanal() async {
     final prefs = await SharedPreferences.getInstance();
-    final List<String> diasCompletos = prefs.getStringList(_keyDiasAtividade) ?? [];
+    final List<String> diasCompletos =
+        prefs.getStringList(_keyDiasAtividade) ?? [];
 
     final DateTime now = DateTime.now();
     final int diasDesdeDomingo = now.weekday % 7;
-    final DateTime inicioSemana = DateTime(now.year, now.month, now.day).subtract(
-      Duration(days: diasDesdeDomingo),
-    );
+    final DateTime inicioSemana = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(Duration(days: diasDesdeDomingo));
 
     final List<Map<String, dynamic>> semana = [];
 
@@ -126,5 +132,13 @@ class StreakService {
     }
 
     return semana;
+  }
+
+  static Future<void> limparDadosLocais() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_keyStreak);
+    await prefs.remove(_keyAtivoHoje);
+    await prefs.remove(_keyWeeklyActivity);
+    await prefs.remove(_keyDiasAtividade);
   }
 }
