@@ -4,7 +4,8 @@ import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/widgets/progresso_semanal.dart';
 import 'package:sinais_de_inclusao/widgets/gradient_background.dart';
 import 'package:sinais_de_inclusao/service/streak_service.dart';
-import 'dart:convert'; // Certifique-se de ter esse import no topo da PerfilPage
+import 'dart:convert';
+
 class PerfilPage extends StatefulWidget {
   const PerfilPage({super.key});
 
