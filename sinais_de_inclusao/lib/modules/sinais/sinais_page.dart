@@ -158,7 +158,7 @@ class _SinaisPageState extends State<SinaisPage> {
                   titulo: 'Início',
                   icone: Icons.home,
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/temas');
+                    Navigator.pushNamed(context, '/temas');
                   },
                 ),
               ),
@@ -167,7 +167,7 @@ class _SinaisPageState extends State<SinaisPage> {
                   titulo: 'Favoritos',
                   icone: Icons.favorite,
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/favoritos');
+                    Navigator.pushNamed(context, '/favoritos');
                   },
                 ),
               ),
@@ -176,7 +176,7 @@ class _SinaisPageState extends State<SinaisPage> {
                   titulo: 'Perfil',
                   icone: Icons.person,
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/perfil');
+                    Navigator.pushNamed(context, '/perfil');
                   },
                 ),
               ),

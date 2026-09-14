@@ -189,7 +189,7 @@ class _FavoritosPageState extends State<FavoritosPage> {
                   titulo: 'Início',
                   icone: Icons.home,
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/temas');
+                    Navigator.pushNamed(context, '/temas');
                   },
                 ),
               ),
@@ -198,7 +198,7 @@ class _FavoritosPageState extends State<FavoritosPage> {
                   titulo: 'Favoritos',
                   icone: Icons.favorite,
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/favoritos');
+                    Navigator.pushNamed(context, '/favoritos');
                   },
                 ),
               ),
@@ -207,7 +207,7 @@ class _FavoritosPageState extends State<FavoritosPage> {
                   titulo: 'Perfil',
                   icone: Icons.person,
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/perfil');
+                    Navigator.pushNamed(context, '/perfil');
                   },
                 ),
               ),

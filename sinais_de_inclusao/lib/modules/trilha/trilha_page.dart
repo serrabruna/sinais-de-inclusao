@@ -445,7 +445,7 @@ class _TrilhaPageState extends State<TrilhaPage> {
               icon:
                   const Icon(Icons.home, color: Color(0xFF623FBD), size: 32),
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/temas');
+                Navigator.pushNamed(context, '/temas');
               },
             ),
             Container(
@@ -467,12 +467,8 @@ class _TrilhaPageState extends State<TrilhaPage> {
               icon: const Icon(Icons.favorite,
                   color: Color(0xFF623FBD), size: 32),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const FavoritosPage(),
-                  ),
-                );
+                    Navigator.pushNamed(context, '/favoritos');
+
               },
             ),
           ],

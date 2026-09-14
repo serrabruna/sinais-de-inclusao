@@ -248,7 +248,6 @@ class _TemasPageState extends State<TemasPage> {
                   titulo: 'Início',
                   icone: Icons.home,
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/temas');
                   },
                 ),
               ),
@@ -257,7 +256,7 @@ class _TemasPageState extends State<TemasPage> {
                   titulo: 'Favoritos',
                   icone: Icons.favorite,
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/favoritos');
+                    Navigator.pushNamed(context, '/favoritos');
                   },
                 ),
               ),
@@ -266,7 +265,7 @@ class _TemasPageState extends State<TemasPage> {
                   titulo: 'Perfil',
                   icone: Icons.person,
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/perfil');
+                    Navigator.pushNamed(context, '/perfil');
                   },
                 ),
               ),
