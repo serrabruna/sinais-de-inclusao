@@ -432,48 +432,66 @@ class _TrilhaPageState extends State<TrilhaPage> {
         ),
       );
 
-  Widget _buildFooter() => Container(
-        height: 80,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+ Widget _buildFooter() => Container(
+  height: 80,
+  decoration: const BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.vertical(
+      top: Radius.circular(25),
+    ),
+  ),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
+    children: [
+      
+      IconButton(
+        icon: const Icon(
+          Icons.home,
+          color: Color(0xFF623FBD),
+          size: 32,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon:
-                  const Icon(Icons.home, color: Color(0xFF623FBD), size: 32),
-              onPressed: () {
-                Navigator.pushNamed(context, '/temas');
-              },
-            ),
-            Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color.fromARGB(36, 42, 42, 42),
-                    blurRadius: 8,
-                    spreadRadius: 1,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child:
-                  Image.asset('assets/images/logocirculo.png', height: 50),
-            ),
-            IconButton(
-              icon: const Icon(Icons.favorite,
-                  color: Color(0xFF623FBD), size: 32),
-              onPressed: () {
-                    Navigator.pushNamed(context, '/favoritos');
+        onPressed: () {
+          Navigator.pushNamed(context, '/temas');
+        },
+      ),
 
-              },
+      Material(
+        color: const Color(0xFF623FBD),
+        shape: const CircleBorder(),
+        elevation: 6,
+        shadowColor: Colors.black38,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: () {
+            Navigator.pushNamed(context, '/praticar');
+          },
+          child: const SizedBox(
+            width: 58,
+            height: 58,
+            child: Center(
+              child: Icon(
+                Icons.sign_language,
+                color: Color(0xFFFFB76F),
+                size: 32,
+              ),
             ),
-          ],
+          ),
         ),
-      );
+      ),
+
+      IconButton(
+        icon: const Icon(
+          Icons.favorite,
+          color: Color(0xFF623FBD),
+          size: 32,
+        ),
+        onPressed: () {
+          Navigator.pushNamed(context, '/favoritos');
+        },
+      ),
+    ],
+  ),
+);
 }
 
 class AlignmentPlatform extends StatelessWidget {
