@@ -11,6 +11,7 @@ import 'package:sinais_de_inclusao/modules/home/home_page.dart';
 import 'package:sinais_de_inclusao/modules/listarQuestoes/listagem_questoes_page.dart';
 import 'package:sinais_de_inclusao/modules/login/login_page.dart';
 import 'package:sinais_de_inclusao/modules/perfil/perfil_page.dart';
+import 'package:sinais_de_inclusao/modules/pratica/pratica_page.dart';
 import 'package:sinais_de_inclusao/modules/questoes/edicao_questao.dart';
 import 'package:sinais_de_inclusao/modules/questoes/cadastro_questao.dart';
 import 'package:sinais_de_inclusao/modules/questoes/excluir_questao.dart';
@@ -45,7 +46,8 @@ class MyApp extends StatelessWidget {
         '/cadastro-questao': (context) => const CadastroQuestaoPage(),
         '/trilha': (context) => const TrilhaPage(),
         '/perfil': (context) => const PerfilPage(),
-        '/favoritos': (context) => const FavoritosPage()
+        '/favoritos': (context) => const FavoritosPage(),
+        '/praticar': (context) => const PraticaPage()
       },
     );
   }
