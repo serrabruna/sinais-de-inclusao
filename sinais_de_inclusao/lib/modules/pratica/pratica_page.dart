@@ -1,9 +1,6 @@
 import 'dart:math';
 import 'dart:async';
-import 'dart:math';
 
-import 'package:flutter/material.dart';
-import 'package:ultralytics_yolo/ultralytics_yolo.dart';
 import 'package:flutter/material.dart';
 import 'package:ultralytics_yolo/ultralytics_yolo.dart';
 
