@@ -1,8 +1,11 @@
+import 'package:dio/dio.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sinais_de_inclusao/classes/icon_mapper.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/modules/favoritos/favoritos_page.dart';
+import 'package:sinais_de_inclusao/modules/pratica/pratica_page.dart';
 import 'package:sinais_de_inclusao/service/streak_service.dart';
 import 'package:sinais_de_inclusao/widgets/flow_atividades_page.dart';
 
@@ -41,7 +44,7 @@ class _TrilhaPageState extends State<TrilhaPage> {
       });
     }
   }
-  
+
   Future<void> _carregarEstrelasSalvas() async {
     final prefs = await SharedPreferences.getInstance();
     final Map<int, int> mapa = {};
@@ -60,18 +63,16 @@ class _TrilhaPageState extends State<TrilhaPage> {
     }
   }
 
-  
   Future<void> _salvarEstrelas(int idCategoria, int novasEstrelas) async {
     final int estrelasAtuais = _estrelasPorCategoria[idCategoria] ?? 0;
 
     if (novasEstrelas > estrelasAtuais) {
-      
       if (mounted) {
         setState(() {
           _estrelasPorCategoria[idCategoria] = novasEstrelas;
         });
       }
-      
+
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('estrelas_categoria_$idCategoria', novasEstrelas);
 
@@ -113,7 +114,16 @@ class _TrilhaPageState extends State<TrilhaPage> {
   Future<void> _fetchXP() async {
     try {
       final dio = await DioClient.getInstance();
-      final response = await dio.get('/user/xp');
+      final response = await dio.get(
+        '/user/xp',
+        options: Options(
+          extra: {
+            'dio_cache_interceptor': {
+              'policy': CachePolicy.refresh,
+            }
+          },
+        ),
+      );
 
       if (mounted && response.data != null) {
         setState(() {
@@ -125,6 +135,22 @@ class _TrilhaPageState extends State<TrilhaPage> {
       debugPrint("Erro ao carregar XP: $e");
       if (mounted) setState(() => _isLoadingXp = false);
     }
+  }
+
+  void _abrirPratica() async {
+    final dynamic resultado = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const PraticaPage()),
+    );
+
+    if (resultado != null && resultado is int && resultado > 0) {
+      setState(() {
+        _xpTotal += resultado;
+      });
+    }
+
+    _fetchXP();
+    _carregarEsquenta();
   }
 
   void _iniciarTrilha(int idCategoria) async {
@@ -432,66 +458,61 @@ class _TrilhaPageState extends State<TrilhaPage> {
         ),
       );
 
- Widget _buildFooter() => Container(
-  height: 80,
-  decoration: const BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.vertical(
-      top: Radius.circular(25),
-    ),
-  ),
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceAround,
-    children: [
-      
-      IconButton(
-        icon: const Icon(
-          Icons.home,
-          color: Color(0xFF623FBD),
-          size: 32,
-        ),
-        onPressed: () {
-          Navigator.pushNamed(context, '/temas');
-        },
-      ),
-
-      Material(
-        color: const Color(0xFF623FBD),
-        shape: const CircleBorder(),
-        elevation: 6,
-        shadowColor: Colors.black38,
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: () {
-            Navigator.pushNamed(context, '/praticar');
-          },
-          child: const SizedBox(
-            width: 58,
-            height: 58,
-            child: Center(
-              child: Icon(
-                Icons.sign_language,
-                color: Color(0xFFFFB76F),
-                size: 32,
-              ),
-            ),
+  Widget _buildFooter() => Container(
+        height: 80,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(25),
           ),
         ),
-      ),
-
-      IconButton(
-        icon: const Icon(
-          Icons.favorite,
-          color: Color(0xFF623FBD),
-          size: 32,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+              icon: const Icon(
+                Icons.home,
+                color: Color(0xFF623FBD),
+                size: 32,
+              ),
+              onPressed: () {
+                Navigator.pushNamed(context, '/temas');
+              },
+            ),
+            Material(
+              color: const Color(0xFF623FBD),
+              shape: const CircleBorder(),
+              elevation: 6,
+              shadowColor: Colors.black38,
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: _abrirPratica,
+                child: const SizedBox(
+                  width: 58,
+                  height: 58,
+                  child: Center(
+                    child: Icon(
+                      Icons.sign_language,
+                      color: Color(0xFFFFB76F),
+                      size: 32,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.favorite,
+                color: Color(0xFF623FBD),
+                size: 32,
+              ),
+              onPressed: () {
+                Navigator.pushNamed(context, '/favoritos');
+              },
+            ),
+          ],
         ),
-        onPressed: () {
-          Navigator.pushNamed(context, '/favoritos');
-        },
-      ),
-    ],
-  ),
-);
+      );
 }
 
 class AlignmentPlatform extends StatelessWidget {
