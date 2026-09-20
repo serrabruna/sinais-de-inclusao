@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:screen_brightness/screen_brightness.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:ultralytics_yolo/ultralytics_yolo.dart';
 
@@ -50,14 +51,32 @@ class _PraticaPageState extends State<PraticaPage> {
     super.initState();
     sinalAlvo = sinaisDisponiveis[Random().nextInt(sinaisDisponiveis.length)];
     _iniciarTimer();
+    _ajustarBrilhoMaximo();
   }
+
+  Future<void> _ajustarBrilhoMaximo() async {
+  try {
+    await ScreenBrightness.instance.setApplicationScreenBrightness(1.0);
+  } catch (e) {
+    debugPrint('Erro ao ajustar brilho da aplicação: $e');
+  }
+}
 
   @override
   void dispose() {
+    _restaurarBrilho();
     _timer?.cancel();
     _timer = null;
     super.dispose();
   }
+
+  Future<void> _restaurarBrilho() async {
+  try {
+    await ScreenBrightness.instance.resetApplicationScreenBrightness();
+  } catch (e) {
+    debugPrint('Erro ao restaurar brilho da aplicação: $e');
+  }
+}
 
   void _iniciarTimer() {
     _timer?.cancel();
@@ -209,6 +228,7 @@ class _PraticaPageState extends State<PraticaPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
+        await _restaurarBrilho();
         Navigator.pop(context, _xpGanhoSessao);
         return false;
       },
