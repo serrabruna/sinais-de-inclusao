@@ -41,8 +41,15 @@ class _PerfilPageState extends State<PerfilPage> {
   @override
   void initState() {
     super.initState();
-    _carregarPerfil();
-    _carregarStreak();
+    _carregarDados();
+  }
+
+  
+  Future<void> _carregarDados() async {
+    await Future.wait([
+      _carregarPerfil(),
+      _carregarStreak(),
+    ]);
   }
 
   Future<void> _carregarPerfil() async {
@@ -56,8 +63,8 @@ class _PerfilPageState extends State<PerfilPage> {
       setState(() {
         _nome = data['name']?.toString() ?? 'Usuário';
         _email = data['email']?.toString() ?? '';
-        _xp = (data['xp'] ?? 0).toInt();
-        _nivel = (data['unlockedLevel'] ?? 0).toInt();
+        _xp = int.tryParse(data['xp']?.toString() ?? '') ?? (data['xp'] ?? 0);
+        _nivel = int.tryParse(data['unlockedLevel']?.toString() ?? '') ?? (data['unlockedLevel'] ?? 0);
         _icone = data['icon']?.toString() ?? 'face_1';
 
         _avatarSelecionado = avatares.indexWhere(
@@ -79,6 +86,25 @@ class _PerfilPageState extends State<PerfilPage> {
         _erro = 'Não foi possível carregar o perfil.';
         _carregando = false;
       });
+    }
+  }
+
+  Future<void> _carregarStreak() async {
+    try {
+      final status = await StreakService.obterStatusEsquenta();
+      final semana = await StreakService.obterAtividadeSemanal();
+
+      if (!mounted) return;
+
+      setState(() {
+        _streak = status['streak'] ?? 0;
+        _streakAtivoHoje = status['ativoHoje'] ?? false;
+        _atividadeSemanal = semana;
+      });
+
+      debugPrint('STREAK: $_streak | ATIVO HOJE: $_streakAtivoHoje');
+    } catch (e) {
+      debugPrint('ERRO AO CARREGAR STREAK: $e');
     }
   }
 
@@ -110,26 +136,6 @@ class _PerfilPageState extends State<PerfilPage> {
           _salvandoAvatar = false;
         });
       }
-    }
-  }
-
-  Future<void> _carregarStreak() async {
-    try {
-      final status = await StreakService.obterStatusEsquenta();
-      final semana = await StreakService.obterAtividadeSemanal();
-
-      if (!mounted) return;
-
-      setState(() {
-        _streak = status['streak'] ?? 0;
-        _streakAtivoHoje = status['ativoHoje'] ?? false;
-        _atividadeSemanal = semana;
-      });
-
-      debugPrint('STREAK LOCAL: $_streak');
-      debugPrint('ATIVIDADE SEMANAL LOCAL: $_atividadeSemanal');
-    } catch (e) {
-      debugPrint('ERRO AO CARREGAR STREAK LOCAL: $e');
     }
   }
 
@@ -275,168 +281,236 @@ class _PerfilPageState extends State<PerfilPage> {
                     style: const TextStyle(color: Colors.white),
                   ),
                 )
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      GestureDetector(
-                        onTap: _salvandoAvatar ? null : _selecionarAvatar,
-                        child: Stack(
-                          children: [
-                            Container(
-                              width: 105,
-                              height: 105,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFFB46E),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 4,
-                                ),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black26,
-                                    blurRadius: 8,
-                                    offset: Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: _salvandoAvatar
-                                  ? const Padding(
-                                      padding: EdgeInsets.all(30),
-                                      child: CircularProgressIndicator(
-                                        color: Color(0xFF623FBD),
-                                        strokeWidth: 3,
-                                      ),
-                                    )
-                                  : Icon(
-                                      avatares[_avatarSelecionado]['icone']
-                                          as IconData,
-                                      size: 65,
-                                      color: const Color(0xFF623FBD),
-                                    ),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Container(
-                                width: 34,
-                                height: 34,
+              : RefreshIndicator(
+                  color: const Color(0xFF623FBD),
+                  onRefresh: _carregarDados,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        GestureDetector(
+                          onTap: _salvandoAvatar ? null : _selecionarAvatar,
+                          child: Stack(
+                            children: [
+                              Container(
+                                width: 105,
+                                height: 105,
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: const Color(0xFFFFB46E),
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: const Color(0xFFFFB46E),
-                                    width: 2,
+                                    color: Colors.white,
+                                    width: 4,
+                                  ),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 8,
+                                      offset: Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: _salvandoAvatar
+                                    ? const Padding(
+                                        padding: EdgeInsets.all(30),
+                                        child: CircularProgressIndicator(
+                                          color: Color(0xFF623FBD),
+                                          strokeWidth: 3,
+                                        ),
+                                      )
+                                    : Icon(
+                                        avatares[_avatarSelecionado]['icone']
+                                            as IconData,
+                                        size: 65,
+                                        color: const Color(0xFF623FBD),
+                                      ),
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Container(
+                                  width: 34,
+                                  height: 34,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: const Color(0xFFFFB46E),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: const Icon(
+                                    Icons.edit,
+                                    size: 17,
+                                    color: Color(0xFF623FBD),
                                   ),
                                 ),
-                                child: const Icon(
-                                  Icons.edit,
-                                  size: 17,
-                                  color: Color(0xFF623FBD),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        Text(
+                          _nome,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          _email,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 15,
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        ProgressoSemanal(atividadeSemanal: _atividadeSemanal),
+                        const SizedBox(height: 30),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 20,
+                            horizontal: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Row(
+                            children: [
+                              _estatistica(
+                                Icons.star_rounded,
+                                '$_xp',
+                                'XP',
+                                Colors.amber,
+                              ),
+                              _divisor(),
+                              _estatistica(
+                                Icons.emoji_events_rounded,
+                                '$_nivel',
+                                'Nível',
+                                const Color(0xFF623FBD),
+                              ),
+                              _divisor(),
+                              
+                              _estatistica(
+                                Icons.local_fire_department_rounded,
+                                '$_streak',
+                                _streakAtivoHoje ? 'Ofensiva ativa' : 'Pendente hoje',
+                                _streakAtivoHoje ? Colors.orange : Colors.grey.shade400,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Column(
+                            children: [
+                              _informacao(Icons.person_outline, 'Nome', _nome),
+                              const Divider(height: 30),
+                              _informacao(Icons.email_outlined, 'E-mail', _email),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+
+                        
+                        _botaoUpgradePremium(),
+
+                        const SizedBox(height: 15),
+
+                        
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: ElevatedButton.icon(
+                            onPressed: _sair,
+                            icon: const Icon(Icons.logout_rounded),
+                            label: const Text(
+                              'Sair da conta',
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white.withOpacity(0.18),
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                                side: const BorderSide(
+                                  color: Colors.white38,
+                                  width: 1.5,
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      Text(
-                        _nome,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        _email,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 15,
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      ProgressoSemanal(atividadeSemanal: _atividadeSemanal),
-                      const SizedBox(height: 30),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 20,
-                          horizontal: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        child: Row(
-                          children: [
-                            _estatistica(
-                              Icons.star_rounded,
-                              '$_xp',
-                              'XP',
-                              Colors.amber,
-                            ),
-                            _divisor(),
-                            _estatistica(
-                              Icons.emoji_events_rounded,
-                              '$_nivel',
-                              'Nível',
-                              const Color(0xFF623FBD),
-                            ),
-                            _divisor(),
-                            _estatistica(
-                              Icons.local_fire_department_rounded,
-                              '$_streak',
-                              'Sequência',
-                              Colors.orange,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 25),
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        child: Column(
-                          children: [
-                            _informacao(Icons.person_outline, 'Nome', _nome),
-                            const Divider(height: 30),
-                            _informacao(Icons.email_outlined, 'E-mail', _email),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 25),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: ElevatedButton.icon(
-                          onPressed: _sair,
-                          icon: const Icon(Icons.logout_rounded),
-                          label: const Text(
-                            'Sair da conta',
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFFB46E),
-                            foregroundColor: const Color(0xFF623FBD),
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
-                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
+        ),
+      ),
+    );
+  }
+
+  Widget _botaoUpgradePremium() {
+    return Container(
+      width: double.infinity,
+      height: 54,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFB46E), Color(0xFFFF8A00)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 8,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: ElevatedButton.icon(
+        onPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Redirecionando para o Plano Premium...'),
+            ),
+          );
+        },
+        icon: const Icon(
+          Icons.arrow_upward_rounded,
+          color: Color(0xFF623FBD),
+          size: 24,
+        ),
+        label: const Text(
+          'Fazer Upgrade para Premium',
+          style: TextStyle(
+            color: Color(0xFF623FBD),
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
         ),
       ),
     );
@@ -458,7 +532,8 @@ class _PerfilPageState extends State<PerfilPage> {
           ),
           Text(
             titulo,
-            style: const TextStyle(color: Colors.black54, fontSize: 12),
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.black54, fontSize: 11),
           ),
         ],
       ),

@@ -15,8 +15,28 @@ class StreakService {
     return '${data.year}-$mes-$dia';
   }
 
+  static bool _parseBool(dynamic valor) {
+    if (valor == null) return false;
+    if (valor is bool) return valor;
+    if (valor is num) return valor == 1;
+    if (valor is String) return valor.toLowerCase() == 'true' || valor == '1';
+    return false;
+  }
+  
+  static int _parseInt(dynamic valor, {int fallback = 0}) {
+    if (valor == null) return fallback;
+    if (valor is int) return valor;
+    if (valor is num) return valor.toInt();
+    return int.tryParse(valor.toString()) ?? fallback;
+  }
+
   static Future<Map<String, dynamic>> obterStatusEsquenta() async {
     final prefs = await SharedPreferences.getInstance();
+    final hojeStr = _formatarData(DateTime.now());
+
+    
+    final List<String> diasLocais = prefs.getStringList(_keyDiasAtividade) ?? [];
+    final bool concluidoLocalmenteHoje = diasLocais.contains(hojeStr);
 
     try {
       final dio = await DioClient.getInstance();
@@ -24,14 +44,28 @@ class StreakService {
 
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data;
-        final int streak = (data['streak'] ?? 0) as int;
-        final bool ativoHoje = (data['streakActiveToday'] ?? false) as bool;
-        final List<dynamic> weekly =
-            (data['weeklyActivity'] ?? []) as List<dynamic>;
 
+        
+        final int streak = _parseInt(data['streak'] ?? data['streakCount']);
+        
+        final dynamic apiAtivoRaw = data['streakActiveToday'] ??
+            data['streak_active_today'] ??
+            data['activeToday'] ??
+            data['ativoHoje'];
+
+        
+        final bool apiAtivo = _parseBool(apiAtivoRaw);
+        final bool ativoHoje = apiAtivo || concluidoLocalmenteHoje;
+
+        final List<dynamic> weekly =
+            (data['weeklyActivity'] ?? data['weekly_activity'] ?? []) as List<dynamic>;
+
+        
         await prefs.setInt(_keyStreak, streak);
         await prefs.setBool(_keyAtivoHoje, ativoHoje);
-        await prefs.setString(_keyWeeklyActivity, jsonEncode(weekly));
+        if (weekly.isNotEmpty) {
+          await prefs.setString(_keyWeeklyActivity, jsonEncode(weekly));
+        }
 
         return {
           'streak': streak,
@@ -40,18 +74,19 @@ class StreakService {
         };
       }
     } catch (e) {
-      debugPrint(
-        "Aviso [StreakService]: Falha ao buscar perfil na API, usando cache: $e",
-      );
+      debugPrint("Aviso [StreakService]: Falha ao buscar API, usando cache: $e");
     }
 
+    
     final cachedWeeklyStr = prefs.getString(_keyWeeklyActivity);
     final List<dynamic> cachedWeekly =
         cachedWeeklyStr != null ? jsonDecode(cachedWeeklyStr) : [];
 
+    final bool ativoEmCache = prefs.getBool(_keyAtivoHoje) ?? false;
+
     return {
-      'streak': prefs.getInt(_keyStreak) ?? 0,
-      'ativoHoje': prefs.getBool(_keyAtivoHoje) ?? false,
+      'streak': prefs.getInt(_keyStreak) ?? (concluidoLocalmenteHoje ? 1 : 0),
+      'ativoHoje': ativoEmCache || concluidoLocalmenteHoje,
       'weeklyActivity': cachedWeekly,
     };
   }
@@ -59,13 +94,15 @@ class StreakService {
   static Future<Map<String, dynamic>> registrarTreinoConcluido() async {
     final prefs = await SharedPreferences.getInstance();
     final DateTime now = DateTime.now();
-
     final String hojeStr = _formatarData(now);
+
+    
     final List<String> dias = prefs.getStringList(_keyDiasAtividade) ?? [];
     if (!dias.contains(hojeStr)) {
       dias.add(hojeStr);
       await prefs.setStringList(_keyDiasAtividade, dias);
     }
+    await prefs.setBool(_keyAtivoHoje, true);
 
     try {
       final dio = await DioClient.getInstance();
@@ -73,15 +110,19 @@ class StreakService {
 
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data;
-        final int streak = (data['streak'] ?? 1) as int;
-        final bool ativoHoje = (data['streakActiveToday'] ?? true) as bool;
-        final int xp = (data['xp'] ?? 0) as int;
+        final int streak = _parseInt(data['streak'], fallback: 1);
+        final bool ativoHoje = _parseBool(
+          data['streakActiveToday'] ?? data['streak_active_today'] ?? true,
+        );
+        final int xp = _parseInt(data['xp']);
         final List<dynamic> weekly =
             (data['weeklyActivity'] ?? []) as List<dynamic>;
 
         await prefs.setInt(_keyStreak, streak);
         await prefs.setBool(_keyAtivoHoje, ativoHoje);
-        await prefs.setString(_keyWeeklyActivity, jsonEncode(weekly));
+        if (weekly.isNotEmpty) {
+          await prefs.setString(_keyWeeklyActivity, jsonEncode(weekly));
+        }
 
         return {
           'streak': streak,
@@ -94,12 +135,16 @@ class StreakService {
       debugPrint("Erro [StreakService]: Falha ao registrar treino na API: $e");
     }
 
+    final int streakAtual = prefs.getInt(_keyStreak) ?? 0;
+    final int novoStreak = streakAtual == 0 ? 1 : streakAtual;
+    await prefs.setInt(_keyStreak, novoStreak);
+
     final cachedWeeklyStr = prefs.getString(_keyWeeklyActivity);
     final List<dynamic> cachedWeekly =
         cachedWeeklyStr != null ? jsonDecode(cachedWeeklyStr) : [];
 
     return {
-      'streak': (prefs.getInt(_keyStreak) ?? 0) + 1,
+      'streak': novoStreak,
       'ativoHoje': true,
       'xp': 0,
       'weeklyActivity': cachedWeekly,
