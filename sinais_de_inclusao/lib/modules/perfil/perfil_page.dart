@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
+import 'package:sinais_de_inclusao/modules/planos/planos_page.dart';
 import 'package:sinais_de_inclusao/widgets/progresso_semanal.dart';
 import 'package:sinais_de_inclusao/widgets/gradient_background.dart';
 import 'package:sinais_de_inclusao/service/streak_service.dart';
@@ -486,9 +487,11 @@ class _PerfilPageState extends State<PerfilPage> {
       ),
       child: ElevatedButton.icon(
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Redirecionando para o Plano Premium...'),
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const PlanosPage(),
+              fullscreenDialog: true, 
             ),
           );
         },
