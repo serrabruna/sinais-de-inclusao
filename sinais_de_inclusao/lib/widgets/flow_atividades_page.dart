@@ -5,7 +5,13 @@ import 'package:sinais_de_inclusao/service/streak_service.dart';
 
 class FlowAtividadesPage extends StatefulWidget {
   final List<dynamic> questoes;
-  const FlowAtividadesPage({super.key, required this.questoes});
+  final int initialHearts; 
+
+  const FlowAtividadesPage({
+    super.key,
+    required this.questoes,
+    this.initialHearts = 5,
+  });
 
   @override
   State<FlowAtividadesPage> createState() => _FlowAtividadesPageState();
@@ -15,10 +21,12 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
   int _currentIndex = 0;
   int _xpTotalNoFluxo = 0;
   int _acertos = 0;
+  late int _heartsRestantes;
 
   @override
   void initState() {
     super.initState();
+    _heartsRestantes = widget.initialHearts;
     _fetchXPInicial();
   }
 
@@ -36,19 +44,92 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
     }
   }
 
-  void _irParaProxima(int xpGanho) {
+  void _irParaProxima(int xpGanho, int novosHearts) {
     setState(() {
+      _heartsRestantes = novosHearts;
       _xpTotalNoFluxo += xpGanho;
       if (xpGanho > 0) {
         _acertos++;
       }
     });
 
+    
+    if (_heartsRestantes <= 0) {
+      _exibirModalSemVidas();
+      return;
+    }
+
     if (_currentIndex < widget.questoes.length - 1) {
       setState(() => _currentIndex++);
     } else {
       _exibirModalParabens();
     }
+  }
+
+  void _exibirModalSemVidas() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        contentPadding: const EdgeInsets.all(24),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.heart_broken,
+              color: Colors.redAccent,
+              size: 56,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              "Suas vidas acabaram!",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.redAccent,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "Você perdeu todas as suas vidas.\nElas recarregam automaticamente à meia-noite (00:00)!",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 15, color: Colors.grey[700]),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF623FBD),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                onPressed: () {
+                  Navigator.pop(ctx); 
+                  Navigator.pop(context, {
+                    'xp': _xpTotalNoFluxo,
+                    'hearts': 0,
+                    'estrelas': 0,
+                  }); 
+                },
+                child: const Text(
+                  "Voltar à Trilha",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _exibirModalParabens() {
@@ -70,15 +151,15 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
     } else if (taxa >= 0.8) {
       estrelas = 3;
       labelMedalha = '3 Estrelas de Ouro';
-      corMedalha = const Color(0xFFFFD700); 
+      corMedalha = const Color(0xFFFFD700);
     } else if (taxa >= 0.5) {
       estrelas = 2;
       labelMedalha = '2 Estrelas de Prata';
-      corMedalha = const Color(0xFFC0C0C0); 
+      corMedalha = const Color(0xFFC0C0C0);
     } else {
       estrelas = 1;
       labelMedalha = '1 Estrela de Bronze';
-      corMedalha = const Color(0xFFCD7F32); 
+      corMedalha = const Color(0xFFCD7F32);
     }
 
     showDialog(
@@ -141,7 +222,10 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
                   children: [
                     Text(
                       'Acertos: $_acertos de $total',
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -161,7 +245,9 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF623FBD),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                   onPressed: () async {
@@ -172,6 +258,7 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
                     Navigator.pop(ctx);
                     Navigator.pop(context, {
                       'xp': _xpTotalNoFluxo,
+                      'hearts': _heartsRestantes, 
                       'estrelas': estrelas,
                     });
                   },
@@ -262,7 +349,8 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
                     ? List<String>.from(q['options'])
                     : [],
                 alternativaCorreta: (q['correct_answer'] ?? '').toString(),
-                onFinalizado: _irParaProxima,
+                heartsAtuais: _heartsRestantes, 
+                onFinalizado: _irParaProxima,    
               ),
             ),
           ],

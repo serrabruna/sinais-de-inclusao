@@ -18,10 +18,11 @@ class TrilhaPage extends StatefulWidget {
 
 class _TrilhaPageState extends State<TrilhaPage> {
   int _xpTotal = 0;
+  int _hearts = 5; 
   late Future<List<dynamic>> _categoriasFuture;
-  bool _isLoadingXp = true;
+  bool _isLoadingPerfil = true;
 
-  Map<int, int> _estrelasPorCategoria = {};
+  final Map<int, int> _estrelasPorCategoria = {};
 
   int _streak = 0;
   bool _ativoHoje = false;
@@ -31,7 +32,7 @@ class _TrilhaPageState extends State<TrilhaPage> {
     super.initState();
     _carregarEstrelasSalvas();
     _categoriasFuture = _fetchCategorias();
-    _fetchXP();
+    _fetchPerfil();
     _carregarEsquenta();
   }
 
@@ -111,11 +112,12 @@ class _TrilhaPageState extends State<TrilhaPage> {
     return categorias;
   }
 
-  Future<void> _fetchXP() async {
+  
+  Future<void> _fetchPerfil() async {
     try {
       final dio = await DioClient.getInstance();
       final response = await dio.get(
-        '/user/xp',
+        '/user/profile',
         options: Options(
           extra: {
             'dio_cache_interceptor': {
@@ -128,12 +130,13 @@ class _TrilhaPageState extends State<TrilhaPage> {
       if (mounted && response.data != null) {
         setState(() {
           _xpTotal = (response.data['xp'] ?? 0).toInt();
-          _isLoadingXp = false;
+          _hearts = (response.data['hearts'] ?? 5).toInt();
+          _isLoadingPerfil = false;
         });
       }
     } catch (e) {
-      debugPrint("Erro ao carregar XP: $e");
-      if (mounted) setState(() => _isLoadingXp = false);
+      debugPrint("Erro ao carregar perfil/vidas: $e");
+      if (mounted) setState(() => _isLoadingPerfil = false);
     }
   }
 
@@ -149,11 +152,52 @@ class _TrilhaPageState extends State<TrilhaPage> {
       });
     }
 
-    _fetchXP();
+    _fetchPerfil();
     _carregarEsquenta();
   }
 
+  void _exibirAlertaSemVidas() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.heart_broken, color: Colors.redAccent, size: 28),
+            SizedBox(width: 8),
+            Text(
+              "Sem vidas!",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        content: const Text(
+          "Suas vidas acabaram. Elas serão restauradas automaticamente à meia-noite (00:00)!",
+          style: TextStyle(fontSize: 15),
+        ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF623FBD),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Entendido", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _iniciarTrilha(int idCategoria) async {
+    
+    if (_hearts <= 0) {
+      _exibirAlertaSemVidas();
+      return;
+    }
+
     try {
       final dio = await DioClient.getInstance();
       final response = await dio.get('/categories/$idCategoria/signs');
@@ -165,29 +209,33 @@ class _TrilhaPageState extends State<TrilhaPage> {
       if (questoes.isNotEmpty) {
         if (!mounted) return;
 
+        
         final dynamic resultado = await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => FlowAtividadesPage(questoes: questoes),
+            builder: (context) => FlowAtividadesPage(
+              questoes: questoes,
+              initialHearts: _hearts,
+            ),
           ),
         );
 
-        if (resultado != null) {
-          if (resultado is Map) {
-            final novoXp = resultado['xp'] as int?;
-            final estrelas = resultado['estrelas'] as int?;
+        
+        if (resultado != null && resultado is Map) {
+          final novoXp = resultado['xp'] as int?;
+          final novosHearts = resultado['hearts'] as int?;
+          final estrelas = resultado['estrelas'] as int?;
 
-            if (novoXp != null) {
-              setState(() => _xpTotal = novoXp);
-            }
-            if (estrelas != null) {
-              await _salvarEstrelas(idCategoria, estrelas);
-            }
-          } else if (resultado is int) {
-            setState(() => _xpTotal = resultado);
+          setState(() {
+            if (novoXp != null) _xpTotal = novoXp;
+            if (novosHearts != null) _hearts = novosHearts;
+          });
+
+          if (estrelas != null && estrelas > 0) {
+            await _salvarEstrelas(idCategoria, estrelas);
           }
         } else {
-          _fetchXP();
+          _fetchPerfil();
         }
 
         _carregarEsquenta();
@@ -225,7 +273,7 @@ class _TrilhaPageState extends State<TrilhaPage> {
           future: _categoriasFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting ||
-                _isLoadingXp) {
+                _isLoadingPerfil) {
               return const Center(
                 child: CircularProgressIndicator(color: Colors.white),
               );
@@ -379,12 +427,43 @@ class _TrilhaPageState extends State<TrilhaPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
-                  icon:
-                      const Icon(Icons.close, color: Colors.white70, size: 30),
+                  icon: const Icon(Icons.close, color: Colors.white70, size: 30),
                   onPressed: () => Navigator.pop(context),
                 ),
                 Row(
                   children: [
+                    
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.favorite,
+                            color: _hearts > 0 ? Colors.redAccent : Colors.white38,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '$_hearts',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+
+                    
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,

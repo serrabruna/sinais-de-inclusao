@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
 
@@ -7,7 +8,8 @@ class AtividadePage extends StatefulWidget {
   final String urlMidia;
   final List<String> alternativas;
   final String alternativaCorreta;
-  final void Function(int) onFinalizado;
+  final int heartsAtuais;
+  final void Function(int xpGanho, int novosHearts) onFinalizado;
 
   const AtividadePage({
     super.key,
@@ -16,6 +18,7 @@ class AtividadePage extends StatefulWidget {
     required this.urlMidia,
     required this.alternativas,
     required this.alternativaCorreta,
+    required this.heartsAtuais,
     required this.onFinalizado,
   });
 
@@ -27,6 +30,13 @@ class _AtividadePageState extends State<AtividadePage> {
   bool? _foiCorreto;
   String? _alternativaSelecionada;
   bool _enviando = false;
+  late int _hearts;
+
+  @override
+  void initState() {
+    super.initState();
+    _hearts = widget.heartsAtuais;
+  }
 
   @override
   void didUpdateWidget(covariant AtividadePage oldWidget) {
@@ -36,6 +46,7 @@ class _AtividadePageState extends State<AtividadePage> {
         _alternativaSelecionada = null;
         _foiCorreto = null;
         _enviando = false;
+        _hearts = widget.heartsAtuais;
       });
     }
   }
@@ -55,12 +66,20 @@ class _AtividadePageState extends State<AtividadePage> {
         data: {'sign_id': widget.idQuestao, 'user_answer': resposta},
       );
 
-      final String mensagem = response.data['message']?.toString() ?? "";
-      final bool acertou =
-          mensagem.contains("Parabéns") || mensagem.contains("acertou");
+      final data = response.data;
+      final String mensagem = data['message']?.toString() ?? "";
+      final bool acertou = (data['correct'] == true) ||
+          mensagem.contains("Parabéns") ||
+          mensagem.contains("acertou");
+
+      
+      final int novosHearts = (data['hearts'] != null)
+          ? (data['hearts'] as num).toInt()
+          : (acertou ? _hearts : (_hearts > 0 ? _hearts - 1 : 0));
 
       setState(() {
         _foiCorreto = acertou;
+        _hearts = novosHearts;
         _enviando = false;
       });
 
@@ -71,30 +90,38 @@ class _AtividadePageState extends State<AtividadePage> {
           const SnackBar(
             content: Text('Correto! +10 XP'),
             backgroundColor: Colors.green,
-            duration: Duration(seconds: 1),
+            duration: Duration(milliseconds: 900),
           ),
         );
-        Future.delayed(const Duration(seconds: 1), () {
+        Future.delayed(const Duration(milliseconds: 1000), () {
           if (mounted) {
             ScaffoldMessenger.of(context).clearSnackBars();
-            widget.onFinalizado(10);
+            widget.onFinalizado(10, _hearts);
           }
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Resposta incorreta!'),
+          SnackBar(
+            content: Text('Resposta incorreta! Vidas restantes: $_hearts'),
             backgroundColor: Colors.red,
-            duration: Duration(seconds: 1),
+            duration: const Duration(milliseconds: 900),
           ),
         );
 
-        Future.delayed(const Duration(seconds: 1), () {
+        Future.delayed(const Duration(milliseconds: 1000), () {
           if (mounted) {
             ScaffoldMessenger.of(context).clearSnackBars();
-            widget.onFinalizado(0); 
+            widget.onFinalizado(0, _hearts);
           }
         });
+      }
+    } on DioException catch (dioError) {
+      if (mounted) setState(() => _enviando = false);
+      
+      if (dioError.response?.statusCode == 403) {
+        widget.onFinalizado(0, 0);
+      } else {
+        debugPrint("Erro Dio: ${dioError.message}");
       }
     } catch (e) {
       if (mounted) setState(() => _enviando = false);
@@ -138,28 +165,64 @@ class _AtividadePageState extends State<AtividadePage> {
                     ),
                     onPressed: () => Navigator.pop(context),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white24,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      children: const [
-                        Text(
-                          'XP +10',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  Row(
+                    children: [
+                      
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
                         ),
-                        SizedBox(width: 5),
-                        Icon(Icons.star, color: Colors.amber, size: 20),
-                      ],
-                    ),
+                        decoration: BoxDecoration(
+                          color: Colors.white24,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.favorite,
+                              color: _hearts > 0 ? Colors.redAccent : Colors.white38,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '$_hearts',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+
+                      
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white24,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Row(
+                          children: [
+                            Text(
+                              'XP +10',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(width: 5),
+                            Icon(Icons.star, color: Colors.amber, size: 20),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -209,15 +272,11 @@ class _AtividadePageState extends State<AtividadePage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: _obterCorBotao(alternativa),
                             foregroundColor: _obterCorTextoBotao(alternativa),
-
-                            // sombra
                             elevation: 3,
                             shadowColor: Colors.black26,
-
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25),
                             ),
-
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                           ),
                           child: Text(
