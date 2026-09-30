@@ -68,11 +68,11 @@ class _AtividadePageState extends State<AtividadePage> {
 
       final data = response.data;
       final String mensagem = data['message']?.toString() ?? "";
-      final bool acertou = (data['correct'] == true) ||
+      final bool acertou =
+          (data['correct'] == true) ||
           mensagem.contains("Parabéns") ||
           mensagem.contains("acertou");
 
-      
       final int novosHearts = (data['hearts'] != null)
           ? (data['hearts'] as num).toInt()
           : (acertou ? _hearts : (_hearts > 0 ? _hearts - 1 : 0));
@@ -117,7 +117,7 @@ class _AtividadePageState extends State<AtividadePage> {
       }
     } on DioException catch (dioError) {
       if (mounted) setState(() => _enviando = false);
-      
+
       if (dioError.response?.statusCode == 403) {
         widget.onFinalizado(0, 0);
       } else {
@@ -167,7 +167,6 @@ class _AtividadePageState extends State<AtividadePage> {
                   ),
                   Row(
                     children: [
-                      
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,
@@ -181,7 +180,9 @@ class _AtividadePageState extends State<AtividadePage> {
                           children: [
                             Icon(
                               Icons.favorite,
-                              color: _hearts > 0 ? Colors.redAccent : Colors.white38,
+                              color: _hearts > 0
+                                  ? Colors.redAccent
+                                  : Colors.white38,
                               size: 18,
                             ),
                             const SizedBox(width: 4),
@@ -198,7 +199,6 @@ class _AtividadePageState extends State<AtividadePage> {
                       ),
                       const SizedBox(width: 8),
 
-                      
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -232,7 +232,7 @@ class _AtividadePageState extends State<AtividadePage> {
                   width: 250,
                   height: 250,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF3F1FA),
+                    color: const Color(0xFFF6F6F4),
                     borderRadius: BorderRadius.circular(40),
                   ),
                   child: ClipRRect(
@@ -250,7 +250,7 @@ class _AtividadePageState extends State<AtividadePage> {
               Text(
                 widget.enunciado,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: const Color(0xFFF3F1FA),
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),

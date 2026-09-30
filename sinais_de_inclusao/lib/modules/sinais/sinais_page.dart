@@ -112,7 +112,9 @@ class _SinaisPageState extends State<SinaisPage> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
-                    child: CircularProgressIndicator(color: Colors.white),
+                    child: CircularProgressIndicator(
+                      color: const Color(0xFFF6F6F4),
+                    ),
                   );
                 }
                 if (snapshot.hasError) {
@@ -186,7 +188,7 @@ class _SinaisPageState extends State<SinaisPage> {
       ),
     );
   }
-  
+
   Widget _buildCardSinal(dynamic sinal) {
     final int signId = sinal['id'];
     final bool favoritado = _favoritosIds.contains(signId);
@@ -196,7 +198,7 @@ class _SinaisPageState extends State<SinaisPage> {
 
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color:Color(0xFFF6F6F4),
           borderRadius: BorderRadius.circular(25),
 
           boxShadow: const [
@@ -216,6 +218,13 @@ class _SinaisPageState extends State<SinaisPage> {
                   height: 200,
                   width: double.infinity,
                   padding: const EdgeInsets.all(15),
+
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF6F6F4),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(25),
+                    ),
+                  ),
 
                   child: ClipRRect(
                     borderRadius: const BorderRadius.vertical(
