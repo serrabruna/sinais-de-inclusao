@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +20,7 @@ class TrilhaPage extends StatefulWidget {
 
 class _TrilhaPageState extends State<TrilhaPage> {
   int _xpTotal = 0;
-  int _hearts = 5; 
+  int _hearts = 5;
   late Future<List<dynamic>> _categoriasFuture;
   bool _isLoadingPerfil = true;
 
@@ -26,6 +28,8 @@ class _TrilhaPageState extends State<TrilhaPage> {
 
   int _streak = 0;
   bool _ativoHoje = false;
+
+  static const double _itemHeight = 175.0;
 
   @override
   void initState() {
@@ -112,7 +116,6 @@ class _TrilhaPageState extends State<TrilhaPage> {
     return categorias;
   }
 
-  
   Future<void> _fetchPerfil() async {
     try {
       final dio = await DioClient.getInstance();
@@ -192,7 +195,6 @@ class _TrilhaPageState extends State<TrilhaPage> {
   }
 
   void _iniciarTrilha(int idCategoria) async {
-    
     if (_hearts <= 0) {
       _exibirAlertaSemVidas();
       return;
@@ -209,7 +211,6 @@ class _TrilhaPageState extends State<TrilhaPage> {
       if (questoes.isNotEmpty) {
         if (!mounted) return;
 
-        
         final dynamic resultado = await Navigator.push(
           context,
           MaterialPageRoute(
@@ -220,7 +221,6 @@ class _TrilhaPageState extends State<TrilhaPage> {
           ),
         );
 
-        
         if (resultado != null && resultado is Map) {
           final novoXp = resultado['xp'] as int?;
           final novosHearts = resultado['hearts'] as int?;
@@ -296,17 +296,41 @@ class _TrilhaPageState extends State<TrilhaPage> {
                   child: SingleChildScrollView(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 20.0),
-                      child: Column(
-                        children: List.generate(categorias.length, (index) {
-                          double bias = index % 3 == 0
-                              ? 0.0
-                              : (index % 3 == 1 ? -0.6 : 0.6);
-                          return _construirItemTrilha(
-                            categorias[index],
-                            index,
-                            bias: bias,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final double totalHeight =
+                              categorias.length * _itemHeight;
+
+                          return Stack(
+                            children: [
+                              
+                              CustomPaint(
+                                size: Size(constraints.maxWidth, totalHeight),
+                                painter: TrailPathPainter(
+                                  count: categorias.length,
+                                  itemHeight: _itemHeight,
+                                  circleOffset: 47.5,
+                                ),
+                              ),
+                              
+                              Column(
+                                children: List.generate(categorias.length, (index) {
+                                  double bias = index % 3 == 0
+                                      ? 0.0
+                                      : (index % 3 == 1 ? -0.6 : 0.6);
+                                  return SizedBox(
+                                    height: _itemHeight,
+                                    child: _construirItemTrilha(
+                                      categorias[index],
+                                      index,
+                                      bias: bias,
+                                    ),
+                                  );
+                                }),
+                              ),
+                            ],
                           );
-                        }),
+                        },
                       ),
                     ),
                   ),
@@ -333,86 +357,85 @@ class _TrilhaPageState extends State<TrilhaPage> {
 
     return AlignmentPlatform(
       alignment: Alignment(bias, 0.0),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0),
-        child: Opacity(
-          opacity: estaLiberado ? 1.0 : 0.4,
-          child: GestureDetector(
-            onTap: estaLiberado
-                ? () => _iniciarTrilha(id)
-                : () => ScaffoldMessenger.of(context).showSnackBar(
+      child: Opacity(
+        opacity: estaLiberado ? 1.0 : 0.4,
+        child: GestureDetector(
+          onTap: estaLiberado
+              ? () => _iniciarTrilha(id)
+              : () => ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Bloqueado! Complete níveis anteriores.'),
                     ),
                   ),
-            child: Column(
-              children: [
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Container(
-                      width: 95,
-                      height: 95,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 5,
-                            offset: Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        IconMapper.getIcon(nome),
-                        size: 45,
-                        color: const Color(0xFF623FBD),
-                      ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 95,
+                    height: 95,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 5,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    if (!estaLiberado)
-                      const Positioned(
-                        bottom: 0,
-                        right: 4,
-                        child: CircleAvatar(
-                          radius: 12,
-                          backgroundColor: Color.fromARGB(255, 157, 229, 255),
-                          child: Icon(
-                            Icons.lock,
-                            color: Color(0xFF623FBD),
-                            size: 14,
-                          ),
+                    child: Icon(
+                      IconMapper.getIcon(nome),
+                      size: 45,
+                      color: const Color(0xFF623FBD),
+                    ),
+                  ),
+                  if (!estaLiberado)
+                    const Positioned(
+                      bottom: 0,
+                      right: 4,
+                      child: CircleAvatar(
+                        radius: 12,
+                        backgroundColor: Color.fromARGB(255, 157, 229, 255),
+                        child: Icon(
+                          Icons.lock,
+                          color: Color(0xFF623FBD),
+                          size: 14,
                         ),
                       ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                if (estaLiberado && estrelasConquistadas > 0)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 4.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(3, (starIdx) {
-                        return Icon(
-                          Icons.star_rounded,
-                          size: 20,
-                          color: starIdx < estrelasConquistadas
-                              ? corEstrelas
-                              : Colors.white30,
-                        );
-                      }),
                     ),
-                  ),
-                Text(
-                  nome,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                ],
+              ),
+              const SizedBox(height: 6),
+              if (estaLiberado && estrelasConquistadas > 0)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(3, (starIdx) {
+                      return Icon(
+                        Icons.star_rounded,
+                        size: 20,
+                        color: starIdx < estrelasConquistadas
+                            ? corEstrelas
+                            : Colors.white30,
+                      );
+                    }),
                   ),
                 ),
-              ],
-            ),
+              Text(
+                nome,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -432,7 +455,6 @@ class _TrilhaPageState extends State<TrilhaPage> {
                 ),
                 Row(
                   children: [
-                    
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
@@ -462,8 +484,6 @@ class _TrilhaPageState extends State<TrilhaPage> {
                       ),
                     ),
                     const SizedBox(width: 8),
-
-                    
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -608,4 +628,110 @@ class AlignmentPlatform extends StatelessWidget {
         alignment: alignment,
         child: SizedBox(width: 140, child: child),
       );
+}
+
+class TrailPathPainter extends CustomPainter {
+  final int count;
+  final double itemHeight;
+  final double circleOffset;
+
+  TrailPathPainter({
+    required this.count,
+    this.itemHeight = 175.0,
+    this.circleOffset = 47.5,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (count <= 1) return;
+
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.35)
+      ..style = PaintingStyle.fill;
+
+    final fullPath = Path();
+    final centerX = size.width / 2;
+
+    double getX(int index) {
+      double bias = index % 3 == 0 ? 0.0 : (index % 3 == 1 ? -0.6 : 0.6);
+      return centerX + (bias * (size.width - 140) / 2);
+    }
+
+    double getY(int index) => (index * itemHeight) + circleOffset;
+
+    fullPath.moveTo(getX(0), getY(0));
+
+    for (int i = 0; i < count - 1; i++) {
+      final p1X = getX(i);
+      final p1Y = getY(i);
+      final p2X = getX(i + 1);
+      final p2Y = getY(i + 1);
+
+      final controlY = (p1Y + p2Y) / 2;
+      fullPath.cubicTo(p1X, controlY, p2X, controlY, p2X, p2Y);
+    }
+
+    const double stepDistance = 34.0;
+    const double stepWidth = 10.0;
+    bool isLeftFoot = false;
+
+    for (final metric in fullPath.computeMetrics()) {
+      double distance = 55.0;
+
+      while (distance < metric.length - 55.0) {
+        final Tangent? tangent = metric.getTangentForOffset(distance);
+
+        if (tangent != null) {
+          final position = tangent.position;
+          final angle = math.atan2(tangent.vector.dy, tangent.vector.dx);
+
+          final perpX = -math.sin(angle) * (isLeftFoot ? -stepWidth : stepWidth);
+          final perpY = math.cos(angle) * (isLeftFoot ? -stepWidth : stepWidth);
+
+          canvas.save();
+          canvas.translate(position.dx + perpX, position.dy + perpY);
+          canvas.rotate(angle + math.pi / 2);
+
+          _drawPaw(canvas, paint);
+
+          canvas.restore();
+          isLeftFoot = !isLeftFoot;
+        }
+
+        distance += stepDistance;
+      }
+    }
+  }
+
+  void _drawPaw(Canvas canvas, Paint paint) {
+    
+    canvas.drawOval(
+      Rect.fromCenter(center: const Offset(0, 2), width: 11, height: 9),
+      paint,
+    );
+
+    
+    final toes = [
+      [-4.5, -4.5, 3.2, 4.2],
+      [-1.6, -6.5, 3.4, 4.8],
+      [1.6, -6.5, 3.4, 4.8],
+      [4.5, -4.5, 3.2, 4.2],
+    ];
+
+    for (final toe in toes) {
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: Offset(toe[0], toe[1]),
+          width: toe[2],
+          height: toe[3],
+        ),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant TrailPathPainter oldDelegate) {
+    return oldDelegate.count != count;
+  }
 }
