@@ -312,7 +312,6 @@ class _TrilhaPageState extends State<TrilhaPage> {
                                   circleOffset: 47.5,
                                 ),
                               ),
-                              
                               Column(
                                 children: List.generate(categorias.length, (index) {
                                   double bias = index % 3 == 0
@@ -367,75 +366,82 @@ class _TrilhaPageState extends State<TrilhaPage> {
                       content: Text('Bloqueado! Complete níveis anteriores.'),
                     ),
                   ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    width: 95,
-                    height: 95,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 5,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      IconMapper.getIcon(nome),
-                      size: 45,
-                      color: const Color(0xFF623FBD),
-                    ),
-                  ),
-                  if (!estaLiberado)
-                    const Positioned(
-                      bottom: 0,
-                      right: 4,
-                      child: CircleAvatar(
-                        radius: 12,
-                        backgroundColor: Color.fromARGB(255, 157, 229, 255),
-                        child: Icon(
-                          Icons.lock,
-                          color: Color(0xFF623FBD),
-                          size: 14,
-                        ),
+          child: SizedBox(
+            height: _itemHeight,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 95,
+                      height: 95,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 5,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        IconMapper.getIcon(nome),
+                        size: 45,
+                        color: const Color(0xFF623FBD),
                       ),
                     ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              if (estaLiberado && estrelasConquistadas > 0)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(3, (starIdx) {
-                      return Icon(
-                        Icons.star_rounded,
-                        size: 20,
-                        color: starIdx < estrelasConquistadas
-                            ? corEstrelas
-                            : Colors.white30,
-                      );
-                    }),
+                    if (!estaLiberado)
+                      const Positioned(
+                        bottom: 0,
+                        right: 4,
+                        child: CircleAvatar(
+                          radius: 12,
+                          backgroundColor: Color.fromARGB(255, 157, 229, 255),
+                          child: Icon(
+                            Icons.lock,
+                            color: Color(0xFF623FBD),
+                            size: 14,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  nome,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              Text(
-                nome,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                const SizedBox(height: 2),
+                SizedBox(
+                  height: 24,
+                  child: estaLiberado && estrelasConquistadas > 0
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(3, (starIdx) {
+                            return Icon(
+                              Icons.star_rounded,
+                              size: 20,
+                              color: starIdx < estrelasConquistadas
+                                  ? corEstrelas
+                                  : Colors.white30,
+                            );
+                          }),
+                        )
+                      : const SizedBox.shrink(),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -592,7 +598,7 @@ class _TrilhaPageState extends State<TrilhaPage> {
                   child: Center(
                     child: Icon(
                       Icons.sign_language,
-                      color: Color(0xFFFFB76F),
+                      color: Colors.white,
                       size: 32,
                     ),
                   ),
