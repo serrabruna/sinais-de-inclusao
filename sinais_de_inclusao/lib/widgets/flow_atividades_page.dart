@@ -297,7 +297,7 @@ class _FlowAtividadesPageState extends State<FlowAtividadesPage> {
     final q = widget.questoes[_currentIndex];
 
     return Scaffold(
-      backgroundColor: const Color(0xFF623FBD),
+      backgroundColor:Color(0xFF9475EF),
       body: SafeArea(
         bottom: false,
         child: Column(

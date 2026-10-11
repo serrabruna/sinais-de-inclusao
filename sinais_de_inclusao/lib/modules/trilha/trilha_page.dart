@@ -9,6 +9,7 @@ import 'package:sinais_de_inclusao/modules/favoritos/favoritos_page.dart';
 import 'package:sinais_de_inclusao/modules/pratica/pratica_page.dart';
 import 'package:sinais_de_inclusao/service/streak_service.dart';
 import 'package:sinais_de_inclusao/widgets/flow_atividades_page.dart';
+import 'package:sinais_de_inclusao/widgets/gradient_background.dart';
 import 'package:sinais_de_inclusao/widgets/trail_path_painter.dart';
 
 class TrilhaPage extends StatefulWidget {
@@ -123,9 +124,7 @@ class _TrilhaPageState extends State<TrilhaPage> {
         '/user/profile',
         options: Options(
           extra: {
-            'dio_cache_interceptor': {
-              'policy': CachePolicy.refresh,
-            }
+            'dio_cache_interceptor': {'policy': CachePolicy.refresh},
           },
         ),
       );
@@ -168,10 +167,7 @@ class _TrilhaPageState extends State<TrilhaPage> {
           children: [
             Icon(Icons.heart_broken, color: Colors.redAccent, size: 28),
             SizedBox(width: 8),
-            Text(
-              "Sem vidas!",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            Text("Sem vidas!", style: TextStyle(fontWeight: FontWeight.bold)),
           ],
         ),
         content: const Text(
@@ -187,7 +183,10 @@ class _TrilhaPageState extends State<TrilhaPage> {
               ),
             ),
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("Entendido", style: TextStyle(color: Colors.white)),
+            child: const Text(
+              "Entendido",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -203,8 +202,9 @@ class _TrilhaPageState extends State<TrilhaPage> {
     try {
       final dio = await DioClient.getInstance();
       final response = await dio.get('/categories/$idCategoria/signs');
-      final List<dynamic> questoes =
-          (response.data is List) ? response.data : [];
+      final List<dynamic> questoes = (response.data is List)
+          ? response.data
+          : [];
 
       await StreakService.registrarTreinoConcluido();
 
@@ -214,10 +214,8 @@ class _TrilhaPageState extends State<TrilhaPage> {
         final dynamic resultado = await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => FlowAtividadesPage(
-              questoes: questoes,
-              initialHearts: _hearts,
-            ),
+            builder: (context) =>
+                FlowAtividadesPage(questoes: questoes, initialHearts: _hearts),
           ),
         );
 
@@ -268,77 +266,81 @@ class _TrilhaPageState extends State<TrilhaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF623FBD),
-      body: SafeArea(
-        child: FutureBuilder<List<dynamic>>(
-          future: _categoriasFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting ||
-                _isLoadingPerfil) {
-              return const Center(
-                child: CircularProgressIndicator(color: Colors.white),
-              );
-            }
-            if (!snapshot.hasData || snapshot.hasError) {
-              return const Center(
-                child: Text(
-                  "Erro ao carregar trilha",
-                  style: TextStyle(color: Colors.white),
-                ),
-              );
-            }
+      backgroundColor: const Color(0xFF9475EF),
 
-            final categorias = snapshot.data!;
+      body: GradientBackground(
+        child: SafeArea(
+          child: FutureBuilder<List<dynamic>>(
+            future: _categoriasFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting ||
+                  _isLoadingPerfil) {
+                return const Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                );
+              }
+              if (!snapshot.hasData || snapshot.hasError) {
+                return const Center(
+                  child: Text(
+                    "Erro ao carregar trilha",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                );
+              }
 
-            return Column(
-              children: [
-                _buildHeader(),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20.0),
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          final double totalHeight =
-                              categorias.length * _itemHeight;
+              final categorias = snapshot.data!;
 
-                          return Stack(
-                            children: [
-                              CustomPaint(
-                                size: Size(constraints.maxWidth, totalHeight),
-                                painter: TrailPathPainter(
-                                  count: categorias.length,
-                                  itemHeight: _itemHeight,
-                                  circleOffset: 47.5,
+              return Column(
+                children: [
+                  _buildHeader(),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20.0),
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final double totalHeight =
+                                categorias.length * _itemHeight;
+
+                            return Stack(
+                              children: [
+                                CustomPaint(
+                                  size: Size(constraints.maxWidth, totalHeight),
+                                  painter: TrailPathPainter(
+                                    count: categorias.length,
+                                    itemHeight: _itemHeight,
+                                    circleOffset: 47.5,
+                                  ),
                                 ),
-                              ),
-                              
-                              Column(
-                                children: List.generate(categorias.length, (index) {
-                                  double bias = index % 3 == 0
-                                      ? 0.0
-                                      : (index % 3 == 1 ? -0.6 : 0.6);
-                                  return SizedBox(
-                                    height: _itemHeight,
-                                    child: _construirItemTrilha(
-                                      categorias[index],
-                                      index,
-                                      bias: bias,
-                                    ),
-                                  );
-                                }),
-                              ),
-                            ],
-                          );
-                        },
+                                Column(
+                                  children: List.generate(categorias.length, (
+                                    index,
+                                  ) {
+                                    double bias = index % 3 == 0
+                                        ? 0.0
+                                        : (index % 3 == 1 ? -0.6 : 0.6);
+                                    return SizedBox(
+                                      height: _itemHeight,
+                                      child: _construirItemTrilha(
+                                        categorias[index],
+                                        index,
+                                        bias: bias,
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
-                _buildFooter(),
-              ],
-            );
-          },
+                  _buildFooter(),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -363,79 +365,86 @@ class _TrilhaPageState extends State<TrilhaPage> {
           onTap: estaLiberado
               ? () => _iniciarTrilha(id)
               : () => ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Bloqueado! Complete níveis anteriores.'),
-                    ),
+                  const SnackBar(
+                    content: Text('Bloqueado! Complete níveis anteriores.'),
                   ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    width: 95,
-                    height: 95,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 5,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      IconMapper.getIcon(nome),
-                      size: 45,
-                      color: const Color(0xFF623FBD),
-                    ),
-                  ),
-                  if (!estaLiberado)
-                    const Positioned(
-                      bottom: 0,
-                      right: 4,
-                      child: CircleAvatar(
-                        radius: 12,
-                        backgroundColor: Color.fromARGB(255, 157, 229, 255),
-                        child: Icon(
-                          Icons.lock,
-                          color: Color(0xFF623FBD),
-                          size: 14,
-                        ),
+                ),
+          child: SizedBox(
+            height: _itemHeight,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 95,
+                      height: 95,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 5,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        IconMapper.getIcon(nome),
+                        size: 45,
+                        color: const Color(0xFF623FBD),
                       ),
                     ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              if (estaLiberado && estrelasConquistadas > 0)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(3, (starIdx) {
-                      return Icon(
-                        Icons.star_rounded,
-                        size: 20,
-                        color: starIdx < estrelasConquistadas
-                            ? corEstrelas
-                            : Colors.white30,
-                      );
-                    }),
+                    if (!estaLiberado)
+                      const Positioned(
+                        bottom: 0,
+                        right: 4,
+                        child: CircleAvatar(
+                          radius: 12,
+                          backgroundColor: Color.fromARGB(255, 157, 229, 255),
+                          child: Icon(
+                            Icons.lock,
+                            color: Color(0xFF623FBD),
+                            size: 14,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  nome,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              Text(
-                nome,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                const SizedBox(height: 2),
+                SizedBox(
+                  height: 24,
+                  child: estaLiberado && estrelasConquistadas > 0
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(3, (starIdx) {
+                            return Icon(
+                              Icons.star_rounded,
+                              size: 20,
+                              color: starIdx < estrelasConquistadas
+                                  ? corEstrelas
+                                  : Colors.white30,
+                            );
+                          }),
+                        )
+                      : const SizedBox.shrink(),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -443,175 +452,160 @@ class _TrilhaPageState extends State<TrilhaPage> {
   }
 
   Widget _buildHeader() => Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
+    padding: const EdgeInsets.all(20.0),
+    child: Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            IconButton(
+              icon: const Icon(Icons.close, color: Colors.white70, size: 30),
+              onPressed: () => Navigator.pop(context),
+            ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white70, size: 30),
-                  onPressed: () => Navigator.pop(context),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white24,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.favorite,
+                        color: _hearts > 0 ? Colors.redAccent : Colors.white38,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '$_hearts',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 8,
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white24,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.local_fire_department,
+                        color: _ativoHoje
+                            ? Colors.deepOrangeAccent
+                            : Colors.white38,
+                        size: 22,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.white24,
-                        borderRadius: BorderRadius.circular(20),
+                      const SizedBox(width: 4),
+                      Text(
+                        '$_streak',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.favorite,
-                            color: _hearts > 0 ? Colors.redAccent : Colors.white38,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '$_hearts',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white24,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        '$_xpTotal ',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white24,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.local_fire_department,
-                            color: _ativoHoje
-                                ? Colors.deepOrangeAccent
-                                : Colors.white38,
-                            size: 22,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '$_streak',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white24,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            '$_xpTotal ',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                          const Icon(Icons.star,
-                              color: Colors.amber, size: 22),
-                        ],
-                      ),
-                    ),
-                  ],
+                      const Icon(Icons.star, color: Colors.amber, size: 22),
+                    ],
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            const Text(
-              "Faça 100 pontos para desbloquear um novo nível",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
           ],
         ),
-      );
-
-  Widget _buildFooter() => Container(
-        height: 80,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(25),
+        const SizedBox(height: 20),
+        const Text(
+          "Faça 100 pontos para desbloquear um novo nível",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
           ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: const Icon(
-                Icons.home,
-                color: Color(0xFF623FBD),
-                size: 32,
-              ),
-              onPressed: () {
-                Navigator.pushNamed(context, '/temas');
-              },
-            ),
-            Material(
-              color: const Color(0xFF623FBD),
-              shape: const CircleBorder(),
-              elevation: 6,
-              shadowColor: Colors.black38,
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: _abrirPratica,
-                child: const SizedBox(
-                  width: 58,
-                  height: 58,
-                  child: Center(
-                    child: Icon(
-                      Icons.sign_language,
-                      color: Color(0xFFFFB76F),
-                      size: 32,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            IconButton(
-              icon: const Icon(
-                Icons.favorite,
-                color: Color(0xFF623FBD),
-                size: 32,
-              ),
-              onPressed: () {
-                Navigator.pushNamed(context, '/favoritos');
-              },
-            ),
-          ],
+      ],
+    ),
+  );
+
+  Widget _buildFooter() => Container(
+    height: 80,
+    decoration: const BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.home, color: Color(0xFF623FBD), size: 32),
+          onPressed: () {
+            Navigator.pushNamed(context, '/temas');
+          },
         ),
-      );
+        Material(
+          color:  Color(0xFF623FBD),
+          shape: const CircleBorder(),
+          elevation: 6,
+          shadowColor: Colors.black38,
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: _abrirPratica,
+            child: const SizedBox(
+              width: 58,
+              height: 58,
+              child: Center(
+                child: Icon(Icons.sign_language, color:  Colors.white, size: 32),
+              ),
+            ),
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.favorite, color: Color(0xFF623FBD), size: 32),
+          onPressed: () {
+            Navigator.pushNamed(context, '/favoritos');
+          },
+        ),
+      ],
+    ),
+  );
 }
 
 class AlignmentPlatform extends StatelessWidget {
@@ -625,7 +619,7 @@ class AlignmentPlatform extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Align(
-        alignment: alignment,
-        child: SizedBox(width: 140, child: child),
-      );
+    alignment: alignment,
+    child: SizedBox(width: 140, child: child),
+  );
 }

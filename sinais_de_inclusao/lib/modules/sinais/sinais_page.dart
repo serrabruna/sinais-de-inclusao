@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
+import 'package:sinais_de_inclusao/widgets/gradient_background.dart';
 import 'package:sinais_de_inclusao/widgets/menu_button.dart';
 
 class SinaisPage extends StatefulWidget {
@@ -91,55 +92,58 @@ class _SinaisPageState extends State<SinaisPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF623FBD),
+      backgroundColor: Color(0xFF45239B),
       appBar: const CustomAppBar(),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 25.0),
-            child: Text(
-              widget.nomeTema,
-              style: const TextStyle(
-                color: Color(0xFFFFB46E),
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
+
+      body: GradientBackground(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 25.0),
+              child: Text(
+                widget.nomeTema,
+                style: const TextStyle(
+                  color: Color(0xFFFFB46E),
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: FutureBuilder<List<dynamic>>(
-              future: _sinaisFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      color: const Color(0xFFF6F6F4),
-                    ),
-                  );
-                }
-                if (snapshot.hasError) {
-                  return const Center(
-                    child: Text(
-                      "Erro ao carregar sinais",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  );
-                }
+            Expanded(
+              child: FutureBuilder<List<dynamic>>(
+                future: _sinaisFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: const Color(0xFFF6F6F4),
+                      ),
+                    );
+                  }
+                  if (snapshot.hasError) {
+                    return const Center(
+                      child: Text(
+                        "Erro ao carregar sinais",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }
 
-                final sinais = snapshot.data ?? [];
+                  final sinais = snapshot.data ?? [];
 
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 22.0),
-                  itemCount: sinais.length,
-                  itemBuilder: (context, index) {
-                    final sinal = sinais[index];
-                    return _buildCardSinal(sinal);
-                  },
-                );
-              },
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 22.0),
+                    itemCount: sinais.length,
+                    itemBuilder: (context, index) {
+                      final sinal = sinais[index];
+                      return _buildCardSinal(sinal);
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
 
       bottomNavigationBar: SafeArea(
@@ -198,7 +202,7 @@ class _SinaisPageState extends State<SinaisPage> {
 
       child: Container(
         decoration: BoxDecoration(
-          color:Color(0xFFF6F6F4),
+          color: Color(0xFFF6F6F4),
           borderRadius: BorderRadius.circular(25),
 
           boxShadow: const [

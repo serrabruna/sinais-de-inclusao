@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
+import 'package:sinais_de_inclusao/widgets/gradient_background.dart';
 
 class FavoritosPage extends StatefulWidget {
   const FavoritosPage({super.key});
@@ -68,107 +69,109 @@ class _FavoritosPageState extends State<FavoritosPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF623FBD),
+      backgroundColor: Color(0xFF45239B),
 
       appBar: const CustomAppBar(),
 
-      body: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 25),
-            child: Text(
-              'Favoritos',
-              style: TextStyle(
-                color: Color(0xFFFFB46E),
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
+      body: GradientBackground(
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 25),
+              child: Text(
+                'Favoritos',
+                style: TextStyle(
+                  color: Color(0xFFFFB46E),
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
 
-          Expanded(
-            child: FutureBuilder<List<dynamic>>(
-              future: _favoritosFuture,
+            Expanded(
+              child: FutureBuilder<List<dynamic>>(
+                future: _favoritosFuture,
 
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: Colors.white),
-                  );
-                }
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    );
+                  }
 
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text(
-                      'Erro ao carregar favoritos.\n${snapshot.error}',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  );
-                }
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        'Erro ao carregar favoritos.\n${snapshot.error}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }
 
-                final favoritos = snapshot.data ?? [];
+                  final favoritos = snapshot.data ?? [];
 
-                if (favoritos.isEmpty) {
-                  return const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.favorite_border,
-                          color: Colors.white,
-                          size: 70,
-                        ),
-
-                        SizedBox(height: 15),
-
-                        Text(
-                          'Nenhum sinal favoritado ainda.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
+                  if (favoritos.isEmpty) {
+                    return const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.favorite_border,
                             color: Colors.white,
-                            fontSize: 19,
-                            fontWeight: FontWeight.bold,
+                            size: 70,
                           ),
-                        ),
 
-                        SizedBox(height: 8),
+                          SizedBox(height: 15),
 
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 35),
-                          child: Text(
-                            'Favorite os sinais que deseja encontrar mais facilmente.',
+                          Text(
+                            'Nenhum sinal favoritado ainda.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 15,
+                              color: Colors.white,
+                              fontSize: 19,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+
+                          SizedBox(height: 8),
+
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 35),
+                            child: Text(
+                              'Favorite os sinais que deseja encontrar mais facilmente.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 22),
+
+                    itemCount: favoritos.length,
+
+                    itemBuilder: (context, index) {
+                      final favorito = favoritos[index];
+
+                      debugPrint('FAVORITO $index: $favorito');
+
+                      final sinal = favorito['sign'] ?? favorito;
+
+                      return _buildCardSinal(sinal);
+                    },
                   );
-                }
-
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 22),
-
-                  itemCount: favoritos.length,
-
-                  itemBuilder: (context, index) {
-                    final favorito = favoritos[index];
-
-                    debugPrint('FAVORITO $index: $favorito');
-
-                    final sinal = favorito['sign'] ?? favorito;
-
-                    return _buildCardSinal(sinal);
-                  },
-                );
-              },
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
 
       bottomNavigationBar: SafeArea(

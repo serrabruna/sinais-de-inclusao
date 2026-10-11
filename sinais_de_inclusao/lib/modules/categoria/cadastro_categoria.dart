@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
+import 'package:sinais_de_inclusao/widgets/gradient_background.dart';
 
 class CadastroCategoriaPage extends StatefulWidget {
   const CadastroCategoriaPage({super.key});
@@ -12,7 +13,7 @@ class CadastroCategoriaPage extends StatefulWidget {
 
 class _CadastroCategoriaPageState extends State<CadastroCategoriaPage> {
   late TextEditingController _nomeController;
-  late TextEditingController _descricaoController; 
+  late TextEditingController _descricaoController;
 
   bool _carregando = false;
 
@@ -20,13 +21,13 @@ class _CadastroCategoriaPageState extends State<CadastroCategoriaPage> {
   void initState() {
     super.initState();
     _nomeController = TextEditingController();
-    _descricaoController = TextEditingController(); 
+    _descricaoController = TextEditingController();
   }
 
   @override
   void dispose() {
     _nomeController.dispose();
-    _descricaoController.dispose(); 
+    _descricaoController.dispose();
     super.dispose();
   }
 
@@ -45,27 +46,28 @@ class _CadastroCategoriaPageState extends State<CadastroCategoriaPage> {
 
     try {
       final dio = await DioClient.getInstance();
-      
-      await dio.post('/categories', data: {
-        'name': nome,
-        'description': descricao,
-      });
+
+      await dio.post(
+        '/categories',
+        data: {'name': nome, 'description': descricao},
+      );
 
       if (!mounted) return;
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Categoria "$nome" cadastrada com sucesso!')),
       );
-      
+
       Navigator.pop(context, true);
       _nomeController.clear();
       _descricaoController.clear();
-      
     } on DioException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Erro ao cadastrar: ${e.response?.data['error'] ?? 'Erro de conexão'}'),
+          content: Text(
+            'Erro ao cadastrar: ${e.response?.data['error'] ?? 'Erro de conexão'}',
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -77,81 +79,110 @@ class _CadastroCategoriaPageState extends State<CadastroCategoriaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF623FBD),
+      backgroundColor: const Color(0xFF45239B),
       appBar: const CustomAppBar(),
-      body: ListView(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 35.0),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF3F1FA),
-                borderRadius: BorderRadius.circular(40),
+
+      body: GradientBackground(
+        child: ListView(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 25.0,
+                vertical: 10.0,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Center(
-                    child: Text(
-                      'Criar Categoria',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF5134A4),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 25.0,
+                  vertical: 35.0,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF3F1FA),
+                  borderRadius: BorderRadius.circular(40),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Center(
+                      child: Text(
+                        'Criar Categoria',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF5134A4),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 25),
 
-                  const Text(
-                    'Nome da Categoria:',
-                    style: TextStyle(color: Color(0xFF333333), fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 8),
-                  _construirCampoTexto(
-                    controller: _nomeController,
-                    hintText: 'Ex: Animais',
-                  ),
-                  const SizedBox(height: 15),
-                  const Text(
-                    'Descrição:',
-                    style: TextStyle(color: Color(0xFF333333), fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 8),
-                  _construirCampoTexto(
-                    controller: _descricaoController,
-                    hintText: 'Insira a Descrição...',
-                  ),
-                  const SizedBox(height: 25),
-                  _carregando
-                      ? const Center(child: CircularProgressIndicator())
-                      : Center(
-                          child: SizedBox(
-                            width: 220,
-                            height: 50,
-                            child: ElevatedButton(
-                              onPressed: _enviarDados,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFFB46E),
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(25),
+                    const SizedBox(height: 25),
+
+                    const Text(
+                      'Nome da Categoria:',
+                      style: TextStyle(
+                        color: Color(0xFF333333),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    _construirCampoTexto(
+                      controller: _nomeController,
+                      hintText: 'Ex: Animais',
+                    ),
+
+                    const SizedBox(height: 15),
+
+                    const Text(
+                      'Descrição:',
+                      style: TextStyle(
+                        color: Color(0xFF333333),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    _construirCampoTexto(
+                      controller: _descricaoController,
+                      hintText: 'Insira a Descrição...',
+                    ),
+
+                    const SizedBox(height: 25),
+
+                    _carregando
+                        ? const Center(child: CircularProgressIndicator())
+                        : Center(
+                            child: SizedBox(
+                              width: 220,
+                              height: 50,
+                              child: ElevatedButton(
+                                onPressed: _enviarDados,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFFFB46E),
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(25),
+                                  ),
                                 ),
-                              ),
-                              child: const Text(
-                                'Continuar',
-                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                child: const Text(
+                                  'Continuar',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -182,7 +213,10 @@ class _CadastroCategoriaPageState extends State<CadastroCategoriaPage> {
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: const TextStyle(color: Colors.black26, fontSize: 15),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 15,
+          ),
           border: InputBorder.none,
         ),
       ),

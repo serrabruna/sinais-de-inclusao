@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
+import 'package:sinais_de_inclusao/widgets/gradient_background.dart';
 
 class AtividadePage extends StatefulWidget {
   final int idQuestao;
@@ -147,153 +148,161 @@ class _AtividadePageState extends State<AtividadePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF623FBD),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.close,
-                      color: Colors.white70,
-                      size: 30,
-                    ),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white24,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.favorite,
-                              color: _hearts > 0
-                                  ? Colors.redAccent
-                                  : Colors.white38,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '$_hearts',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
+      backgroundColor: const Color(0xFF9475EF),
 
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white24,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Row(
-                          children: [
-                            Text(
-                              'XP +10',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(width: 5),
-                            Icon(Icons.star, color: Colors.amber, size: 20),
-                          ],
-                        ),
+      body: GradientBackground(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20.0,
+              vertical: 10.0,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.close,
+                        color: Colors.white70,
+                        size: 30,
                       ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 30),
-              Center(
-                child: Container(
-                  width: 250,
-                  height: 250,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF6F6F4),
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(25),
-                    child: Image.network(
-                      widget.urlMidia,
-                      fit: BoxFit.contain,
-                      errorBuilder: (c, e, s) =>
-                          Image.asset('assets/images/logocirculo.png'),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white24,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.favorite,
+                                color: _hearts > 0
+                                    ? Colors.redAccent
+                                    : Colors.white38,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '$_hearts',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white24,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Row(
+                            children: [
+                              Text(
+                                'XP +10',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(width: 5),
+                              Icon(Icons.star, color: Colors.amber, size: 20),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30),
+                Center(
+                  child: Container(
+                    width: 250,
+                    height: 250,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF6F6F4),
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(25),
+                      child: Image.network(
+                        widget.urlMidia,
+                        fit: BoxFit.contain,
+                        errorBuilder: (c, e, s) =>
+                            Image.asset('assets/images/logocirculo.png'),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 30),
-              Text(
-                widget.enunciado,
-                style: const TextStyle(
-                  color: const Color(0xFFF3F1FA),
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+                const SizedBox(height: 30),
+                Text(
+                  widget.enunciado,
+                  style: const TextStyle(
+                    color: const Color(0xFFF3F1FA),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 30),
-              Expanded(
-                child: ListView(
-                  children: widget.alternativas.map((alternativa) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 20,
-                      ),
-                      child: SizedBox(
-                        height: 55,
-                        child: ElevatedButton(
-                          onPressed: () => _verificarResposta(alternativa),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _obterCorBotao(alternativa),
-                            foregroundColor: _obterCorTextoBotao(alternativa),
-                            elevation: 3,
-                            shadowColor: Colors.black26,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
+                const SizedBox(height: 30),
+                Expanded(
+                  child: ListView(
+                    children: widget.alternativas.map((alternativa) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 20,
+                        ),
+                        child: SizedBox(
+                          height: 55,
+                          child: ElevatedButton(
+                            onPressed: () => _verificarResposta(alternativa),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _obterCorBotao(alternativa),
+                              foregroundColor: _obterCorTextoBotao(alternativa),
+                              elevation: 3,
+                              shadowColor: Colors.black26,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                              ),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                          ),
-                          child: Text(
-                            alternativa,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                            child: Text(
+                              alternativa,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

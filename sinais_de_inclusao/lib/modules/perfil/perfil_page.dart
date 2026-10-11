@@ -45,12 +45,8 @@ class _PerfilPageState extends State<PerfilPage> {
     _carregarDados();
   }
 
-  
   Future<void> _carregarDados() async {
-    await Future.wait([
-      _carregarPerfil(),
-      _carregarStreak(),
-    ]);
+    await Future.wait([_carregarPerfil(), _carregarStreak()]);
   }
 
   Future<void> _carregarPerfil() async {
@@ -65,7 +61,9 @@ class _PerfilPageState extends State<PerfilPage> {
         _nome = data['name']?.toString() ?? 'Usuário';
         _email = data['email']?.toString() ?? '';
         _xp = int.tryParse(data['xp']?.toString() ?? '') ?? (data['xp'] ?? 0);
-        _nivel = int.tryParse(data['unlockedLevel']?.toString() ?? '') ?? (data['unlockedLevel'] ?? 0);
+        _nivel =
+            int.tryParse(data['unlockedLevel']?.toString() ?? '') ??
+            (data['unlockedLevel'] ?? 0);
         _icone = data['icon']?.toString() ?? 'face_1';
 
         _avatarSelecionado = avatares.indexWhere(
@@ -257,19 +255,25 @@ class _PerfilPageState extends State<PerfilPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF7458CF),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: Colors.white,
-        title: const Text(
-          'Meu Perfil',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
+  backgroundColor: const Color(0xFF9475EF),
+
+  appBar: AppBar(
+    backgroundColor: const Color(0xFF9475EF),
+    elevation: 0,
+    scrolledUnderElevation: 0,
+    surfaceTintColor: Colors.transparent,
+    foregroundColor: Colors.white,
+
+    title: const Text(
+      'Meu Perfil',
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
       ),
-      extendBodyBehindAppBar: true,
-      body: GradientBackground(
+    ),
+    centerTitle: true,
+  ),
+
+  body: GradientBackground(
         child: SafeArea(
           child: _carregando
               ? const Center(
@@ -397,12 +401,16 @@ class _PerfilPageState extends State<PerfilPage> {
                                 const Color(0xFF623FBD),
                               ),
                               _divisor(),
-                              
+
                               _estatistica(
                                 Icons.local_fire_department_rounded,
                                 '$_streak',
-                                _streakAtivoHoje ? 'Ofensiva ativa' : 'Pendente hoje',
-                                _streakAtivoHoje ? Colors.orange : Colors.grey.shade400,
+                                _streakAtivoHoje
+                                    ? 'Ofensiva ativa'
+                                    : 'Pendente hoje',
+                                _streakAtivoHoje
+                                    ? Colors.orange
+                                    : Colors.grey.shade400,
                               ),
                             ],
                           ),
@@ -418,18 +426,20 @@ class _PerfilPageState extends State<PerfilPage> {
                             children: [
                               _informacao(Icons.person_outline, 'Nome', _nome),
                               const Divider(height: 30),
-                              _informacao(Icons.email_outlined, 'E-mail', _email),
+                              _informacao(
+                                Icons.email_outlined,
+                                'E-mail',
+                                _email,
+                              ),
                             ],
                           ),
                         ),
                         const SizedBox(height: 25),
 
-                        
                         _botaoUpgradePremium(),
 
                         const SizedBox(height: 15),
 
-                        
                         SizedBox(
                           width: double.infinity,
                           height: 52,
@@ -478,11 +488,7 @@ class _PerfilPageState extends State<PerfilPage> {
         ),
         borderRadius: BorderRadius.circular(25),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 8,
-            offset: Offset(0, 3),
-          ),
+          BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 3)),
         ],
       ),
       child: ElevatedButton.icon(
@@ -491,7 +497,7 @@ class _PerfilPageState extends State<PerfilPage> {
             context,
             MaterialPageRoute(
               builder: (context) => const PlanosPage(),
-              fullscreenDialog: true, 
+              fullscreenDialog: true,
             ),
           );
         },
