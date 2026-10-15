@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
+import 'package:sinais_de_inclusao/widgets/gradient_background.dart';
 
 class EdicaoCategoriaPage extends StatefulWidget {
   final Map<String, dynamic>? categoria;
@@ -74,100 +75,114 @@ class _EdicaoCategoriaPageState extends State<EdicaoCategoriaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF623FBD),
+      backgroundColor: const Color(0xFF45239B),
       appBar: const CustomAppBar(),
-      body: ListView(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 25.0,
-              vertical: 10.0,
-            ),
-            child: Container(
+
+      body: GradientBackground(
+        child: ListView(
+          children: [
+            Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 25.0,
-                vertical: 35.0,
+                vertical: 10.0,
               ),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF3F1FA),
-                borderRadius: BorderRadius.circular(40),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Center(
-                    child: Text(
-                      'Editar Categoria',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF5134A4),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 25.0,
+                  vertical: 35.0,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF3F1FA),
+                  borderRadius: BorderRadius.circular(40),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Center(
+                      child: Text(
+                        'Editar Categoria',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF5134A4),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 25),
 
-                  const Text(
-                    'Nome da Categoria:',
-                    style: TextStyle(
-                      color: Color(0xFF333333),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                    const SizedBox(height: 25),
+
+                    const Text(
+                      'Nome da Categoria:',
+                      style: TextStyle(
+                        color: Color(0xFF333333),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  _construirCampoTexto(
-                    controller: _nomeController,
-                    hintText: 'Ex: Animais',
-                  ),
-                  const SizedBox(height: 15),
 
-                  const Text(
-                    'Descrição:',
-                    style: TextStyle(
-                      color: Color(0xFF333333),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                    const SizedBox(height: 8),
+
+                    _construirCampoTexto(
+                      controller: _nomeController,
+                      hintText: 'Ex: Animais',
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  _construirCampoTexto(
-                    controller: _descricaoController,
-                    hintText: 'Insira a Descrição...',
-                  ),
-                  const SizedBox(height: 25),
 
-                  _carregando
-                      ? const Center(child: CircularProgressIndicator())
-                      : Center(
-                          child: SizedBox(
-                            width: 220,
-                            height: 50,
-                            child: ElevatedButton(
-                              onPressed: _enviarDados,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFFB46E),
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(25),
+                    const SizedBox(height: 15),
+
+                    const Text(
+                      'Descrição:',
+                      style: TextStyle(
+                        color: Color(0xFF333333),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    _construirCampoTexto(
+                      controller: _descricaoController,
+                      hintText: 'Insira a Descrição...',
+                    ),
+
+                    const SizedBox(height: 25),
+
+                    _carregando
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                              color: Color(0xFF623FBD),
+                            ),
+                          )
+                        : Center(
+                            child: SizedBox(
+                              width: 220,
+                              height: 50,
+                              child: ElevatedButton(
+                                onPressed: _enviarDados,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFFFB46E),
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(25),
+                                  ),
                                 ),
-                              ),
-                              child: const Text(
-                                'Continuar',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                                child: const Text(
+                                  'Continuar',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

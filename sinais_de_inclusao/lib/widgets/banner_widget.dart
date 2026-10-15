@@ -14,7 +14,6 @@ class _BannerWidgetState extends State<BannerWidget> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18.0),
-      color: Color(0xFF7458CF),
       child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -22,7 +21,7 @@ class _BannerWidgetState extends State<BannerWidget> {
           children: [
             Text(
               'Sinais de Inclusão',
-              style: TextStyle(color: Colors.white, fontSize: 28),
+              style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 24),
@@ -32,7 +31,7 @@ class _BannerWidgetState extends State<BannerWidget> {
               textAlign: TextAlign.center,
             ),
 
-            SizedBox(height: 26),
+            SizedBox(height: 45),
             Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -51,7 +50,7 @@ class _BannerWidgetState extends State<BannerWidget> {
                     ),
                   ),
 
-                  SizedBox(height: 16),
+                  SizedBox(height: 25),
 
                   ElevatedButton(
                     onPressed: () {
@@ -67,7 +66,7 @@ class _BannerWidgetState extends State<BannerWidget> {
                     ),
                   ),
 
-                  SizedBox(height: 24),
+                  SizedBox(height: 15),
                   const CarouselImages(),
                 ],
               ),

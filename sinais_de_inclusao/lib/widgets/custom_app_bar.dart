@@ -35,9 +35,12 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Widget build(BuildContext context) {
     return AppBar(
       toolbarHeight: 100,
-      //altura interna 100px
-      backgroundColor:const Color(0xFF623FBD),
       elevation: 0,
+      scrolledUnderElevation: 0,
+      surfaceTintColor: Colors.transparent,
+
+      backgroundColor: const Color(0xFF9475EF),
+
       title: Image.asset('assets/images/logocirculo.png', height: 70),
 
       automaticallyImplyLeading: false,

@@ -5,6 +5,7 @@ import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
 import 'package:dio/dio.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
+import 'package:sinais_de_inclusao/widgets/gradient_background.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,10 +18,12 @@ class _LoginPageState extends State<LoginPage> {
   late TextEditingController _emailController;
   late TextEditingController _senhaController;
 
-  final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'https://sinais-de-inclusao-api.onrender.com',
-    connectTimeout: const Duration(seconds: 5),
-  ));
+  final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: 'https://sinais-de-inclusao-api.onrender.com',
+      connectTimeout: const Duration(seconds: 5),
+    ),
+  );
 
   bool _carregando = false;
 
@@ -63,7 +66,6 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       if (response.statusCode == 200) {
-
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', response.data['token']);
         await prefs.setString('role', response.data['role']);
@@ -78,10 +80,7 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
       String mensagem = e.response?.data['error'] ?? 'Erro no servidor';
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(mensagem),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(mensagem), backgroundColor: Colors.red),
       );
     } finally {
       if (mounted) setState(() => _carregando = false);
@@ -95,138 +94,152 @@ class _LoginPageState extends State<LoginPage> {
       appBar: const CustomAppBar(),
       body: ListView(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 30.0,
-              vertical: 10.0,
-            ),
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 25.0,
-                vertical: 35.0,
-              ),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF3F1FA),
-                borderRadius: BorderRadius.circular(40),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Center(
-                    child: Text(
-                      'Acesse sua conta',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF5134A4),
-                      ),
-                    ),
+          GradientBackground(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30.0,
+                    vertical: 10.0,
                   ),
-                  const SizedBox(height: 25),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 25.0,
+                      vertical: 35.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF3F1FA),
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Center(
+                          child: Text(
+                            'Acesse sua conta',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF5134A4),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 25),
 
-                  const Text(
-                    'E-mail:',
-                    style: TextStyle(
-                      color: Color(0xFF333333),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _construirCampoTexto(
-                    controller: _emailController,
-                    hintText: 'Insira seu e-mail...',
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  const SizedBox(height: 15),
-
-                  const Text(
-                    'Senha:',
-                    style: TextStyle(
-                      color: Color(0xFF333333),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _construirCampoTexto(
-                    controller: _senhaController,
-                    hintText: 'Insira sua senha...',
-                    obscureText: _ocultarSenha,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _ocultarSenha ? Icons.visibility_off : Icons.visibility,
-                        color: const Color(0xFF623FBD),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _ocultarSenha = !_ocultarSenha;
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  Center(
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: Text.rich(
-                        TextSpan(
-                          text: 'Ainda não possui conta? ',
+                        const Text(
+                          'E-mail:',
                           style: TextStyle(
                             color: Color(0xFF333333),
-                            fontSize: 14,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
                           ),
-
-                          children: [
-                            TextSpan(
-                              text: 'Cadastre-se',
-                              style: TextStyle(
-                                color: Color(0xFF623FBD),
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () => Navigator.pushReplacementNamed(context, '/cadastro'),
-                            ),
-                          ],
                         ),
-                      ),
+                        const SizedBox(height: 8),
+                        _construirCampoTexto(
+                          controller: _emailController,
+                          hintText: 'Insira seu e-mail...',
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 15),
+
+                        const Text(
+                          'Senha:',
+                          style: TextStyle(
+                            color: Color(0xFF333333),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        _construirCampoTexto(
+                          controller: _senhaController,
+                          hintText: 'Insira sua senha...',
+                          obscureText: _ocultarSenha,
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _ocultarSenha
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: const Color(0xFF623FBD),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _ocultarSenha = !_ocultarSenha;
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        Center(
+                          child: GestureDetector(
+                            onTap: () {},
+                            child: Text.rich(
+                              TextSpan(
+                                text: 'Ainda não possui conta? ',
+                                style: TextStyle(
+                                  color: Color(0xFF333333),
+                                  fontSize: 14,
+                                ),
+
+                                children: [
+                                  TextSpan(
+                                    text: 'Cadastre-se',
+                                    style: TextStyle(
+                                      color: Color(0xFF623FBD),
+                                      fontWeight: FontWeight.bold,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () =>
+                                          Navigator.pushReplacementNamed(
+                                            context,
+                                            '/cadastro',
+                                          ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+
+                        _carregando
+                            ? const Center(child: CircularProgressIndicator())
+                            : Center(
+                                child: SizedBox(
+                                  width: 220,
+                                  height: 50,
+                                  child: ElevatedButton(
+                                    onPressed: _enviarDados,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFFFFB46E),
+                                      foregroundColor: Colors.white,
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(25),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Entrar',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 25),
+                ),
 
-                  _carregando
-                      ? const Center(child: CircularProgressIndicator())
-                      : Center(
-                          child: SizedBox(
-                            width: 220,
-                            height: 50,
-                            child: ElevatedButton(
-                              onPressed: _enviarDados,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFFB46E),
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                              ),
-                              child: const Text(
-                                'Entrar',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                ],
-              ),
+                const SizedBox(height: 150),
+              ],
             ),
           ),
-          const SizedBox(height: 150),
+
           const FooterWidget(),
         ],
       ),

@@ -8,6 +8,7 @@ import 'package:sinais_de_inclusao/modules/sinais/sinais_page.dart'; // Importe 
 import 'package:sinais_de_inclusao/widgets/custom_app_bar.dart';
 import 'package:sinais_de_inclusao/widgets/footer_widget.dart';
 import 'package:sinais_de_inclusao/widgets/full_width_button.dart';
+import 'package:sinais_de_inclusao/widgets/gradient_background.dart';
 import 'package:sinais_de_inclusao/widgets/management_bottom_sheet.dart';
 import 'package:sinais_de_inclusao/widgets/menu_button.dart';
 
@@ -85,100 +86,47 @@ class _TemasPageState extends State<TemasPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF623FBD),
+      backgroundColor: Color(0xFF45239B),
       appBar: const CustomAppBar(),
-      body: FutureBuilder<List<dynamic>>(
-        future: _temasFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            );
-          }
-          if (snapshot.hasError || !snapshot.hasData) {
-            return const Center(
-              child: Text(
-                "Erro ao carregar temas",
-                style: TextStyle(color: Colors.white),
-              ),
-            );
-          }
+      body: GradientBackground(
+        child: FutureBuilder<List<dynamic>>(
+          future: _temasFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              );
+            }
 
-          final temas = snapshot.data!;
-
-          return ListView(
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Column(
-                  children: [
-                    Text(
-                      "Temas",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFFFFB46E),
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      "Quais sinais você quer aprender hoje?",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 23,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                  ],
+            if (snapshot.hasError || !snapshot.hasData) {
+              return const Center(
+                child: Text(
+                  'Erro ao carregar temas',
+                  style: TextStyle(color: Colors.white),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: temas.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 20,
-                    crossAxisSpacing: 20,
-                  ),
-                  itemBuilder: (context, index) {
-                    final tema = temas[index];
-                    final String nome = tema is Map
-                        ? tema['name']
-                        : tema.toString();
-                    final int id = tema is Map ? tema['id'] : index;
+              );
+            }
 
-                    return MenuButton(
-                      titulo: nome,
-                      icone: IconMapper.getIcon(nome),
-                      onPressed: () {
-                        // Navegação para a página de sinais
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                SinaisPage(idCategoria: id, nomeTema: nome),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
+            final temas = snapshot.data!;
 
-              if (!_isAdmin) ...[
-                const SizedBox(height: 40),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+            return ListView(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(20.0),
                   child: Column(
                     children: [
-                      const Text(
-                        'Pronto para praticar?',
+                      Text(
+                        "Temas",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xFFFFB46E),
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        "Quais sinais você quer aprender hoje?",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
@@ -186,49 +134,115 @@ class _TemasPageState extends State<TemasPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
-                      const SizedBox(height: 35),
-
-                      FullWidthButton(
-                        titulo: "Começar Atividades",
-                        icone: Icons.play_arrow_rounded,
-                        onPressed: () =>
-                            Navigator.pushNamed(context, '/trilha'),
-                      ),
+                      SizedBox(height: 10),
                     ],
                   ),
                 ),
-              ],
-
-              if (_isAdmin) ...[
-                const SizedBox(height: 30),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    children: [
-                      FullWidthButton(
-                        titulo: "Gerenciar Temas",
-                        icone: Icons.settings,
-                        onPressed: () =>
-                            _mostrarOpcoesGerenciamento(context, temas),
-                      ),
-                      const SizedBox(height: 15),
-                      FullWidthButton(
-                        titulo: "Gerenciar Questões",
-                        icone: Icons.help_outline,
-                        onPressed: () => Navigator.pushNamed(
-                          context,
-                          '/listagem_questoes',
-                        ).then((_) => _recarregarTemas()),
-                      ),
-                    ],
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: temas.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 20,
+                          crossAxisSpacing: 20,
+                        ),
+                    itemBuilder: (context, index) {
+                      final tema = temas[index];
+                      final String nome = tema is Map
+                          ? tema['name']
+                          : tema.toString();
+                      final int id = tema is Map ? tema['id'] : index;
+
+                      return MenuButton(
+                        titulo: nome,
+                        icone: IconMapper.getIcon(nome),
+                        usarGradiente: true,
+
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  SinaisPage(idCategoria: id, nomeTema: nome),
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ),
+
+                if (!_isAdmin) ...[
+                  const SizedBox(height: 40),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Pronto para praticar?',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 23,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        const SizedBox(height: 35),
+                        _botaoGradiente(
+                          titulo: "Começar Atividades",
+                          icone: Icons.play_arrow_rounded,
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/trilha');
+                          },
+                        ),
+                        const SizedBox(height: 35),
+                      ],
+                    ),
+                  ),
+                ],
+
+                if (_isAdmin) ...[
+                  const SizedBox(height: 30),
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      children: [
+                        _botaoGradiente(
+                          titulo: "Gerenciar Temas",
+                          icone: Icons.settings,
+                          onPressed: () {
+                            _mostrarOpcoesGerenciamento(context, temas);
+                          },
+                        ),
+
+                        const SizedBox(height: 15),
+
+                        _botaoGradiente(
+                          titulo: "Gerenciar Questões",
+                          icone: Icons.help_outline,
+                          onPressed: () {
+                            Navigator.pushNamed(
+                              context,
+                              '/listagem_questoes',
+                            ).then((_) => _recarregarTemas());
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 30),
               ],
-              const SizedBox(height: 30),
-            ],
-          );
-        },
+            );
+          },
+        ),
       ),
       bottomNavigationBar: SafeArea(
         top: false,
@@ -247,8 +261,7 @@ class _TemasPageState extends State<TemasPage> {
                 child: _bottomMenuItem(
                   titulo: 'Início',
                   icone: Icons.home,
-                  onPressed: () {
-                  },
+                  onPressed: () {},
                 ),
               ),
               Expanded(
@@ -270,6 +283,49 @@ class _TemasPageState extends State<TemasPage> {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _botaoGradiente({
+    required String titulo,
+    required IconData icone,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      width: double.infinity,
+      height: 54,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFB46E), Color(0xFFFFB76F)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: const [
+          BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 3)),
+        ],
+      ),
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icone, color: const Color(0xFF623FBD), size: 24),
+        label: Text(
+          titulo,
+          style: const TextStyle(
+            color: Color(0xFF623FBD),
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
           ),
         ),
       ),

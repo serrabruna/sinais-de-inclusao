@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:sinais_de_inclusao/http/dio_client.dart';
+import 'package:sinais_de_inclusao/widgets/gradient_background.dart';
 import 'package:ultralytics_yolo/ultralytics_yolo.dart';
 
 class PraticaPage extends StatefulWidget {
@@ -55,12 +56,12 @@ class _PraticaPageState extends State<PraticaPage> {
   }
 
   Future<void> _ajustarBrilhoMaximo() async {
-  try {
-    await ScreenBrightness.instance.setApplicationScreenBrightness(1.0);
-  } catch (e) {
-    debugPrint('Erro ao ajustar brilho da aplicação: $e');
+    try {
+      await ScreenBrightness.instance.setApplicationScreenBrightness(1.0);
+    } catch (e) {
+      debugPrint('Erro ao ajustar brilho da aplicação: $e');
+    }
   }
-}
 
   @override
   void dispose() {
@@ -71,12 +72,12 @@ class _PraticaPageState extends State<PraticaPage> {
   }
 
   Future<void> _restaurarBrilho() async {
-  try {
-    await ScreenBrightness.instance.resetApplicationScreenBrightness();
-  } catch (e) {
-    debugPrint('Erro ao restaurar brilho da aplicação: $e');
+    try {
+      await ScreenBrightness.instance.resetApplicationScreenBrightness();
+    } catch (e) {
+      debugPrint('Erro ao restaurar brilho da aplicação: $e');
+    }
   }
-}
 
   void _iniciarTimer() {
     _timer?.cancel();
@@ -162,14 +163,11 @@ class _PraticaPageState extends State<PraticaPage> {
   Future<void> _enviarAcerto() async {
     try {
       final dio = await DioClient.getInstance();
-      final response = await dio.post(
-        '/user/xp',
-        data: {
-          'xp': 10,
-        },
-      );
+      final response = await dio.post('/user/xp', data: {'xp': 10});
 
-      debugPrint('Resposta do /user/xp: ${response.statusCode} - ${response.data}');
+      debugPrint(
+        'Resposta do /user/xp: ${response.statusCode} - ${response.data}',
+      );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         _xpGanhoSessao += 10;
@@ -233,150 +231,162 @@ class _PraticaPageState extends State<PraticaPage> {
         return false;
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF623FBD),
+        backgroundColor: const Color(0xFF9475EF),
+
         appBar: AppBar(
-          backgroundColor: const Color(0xFF623FBD),
+          backgroundColor: const Color(0xFF9475EF),
           foregroundColor: Colors.white,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          surfaceTintColor: Colors.transparent,
+
           title: const Text('Prática'),
+
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () => Navigator.pop(context, _xpGanhoSessao),
           ),
         ),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        const Text(
-                          'SINAL ALVO',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          sinalAlvo,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 36,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.25),
+        body: GradientBackground(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          const Text(
+                            'SINAL ALVO',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1.2,
                             ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.timer_outlined,
-                                color: Colors.white,
-                                size: 18,
+                          const SizedBox(height: 4),
+                          Text(
+                            sinalAlvo,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(18),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.25),
                               ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '00:${tempoRestante.toString().padLeft(2, '0')}',
-                                style: const TextStyle(
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.timer_outlined,
                                   color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                                  size: 18,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 4),
+                                Text(
+                                  '00:${tempoRestante.toString().padLeft(2, '0')}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      children: [
-                        const Text(
-                          'SINAL CAPTURADO',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1.0,
+                    Expanded(
+                      child: Column(
+                        children: [
+                          const Text(
+                            'SINAL CAPTURADO',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1.0,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          sinalDetectado == 'Nenhum' ? '-' : sinalDetectado,
-                          style: TextStyle(
-                            color: sinalDetectado.toUpperCase() ==
-                                    sinalAlvo.toUpperCase()
-                                ? const Color.fromARGB(255, 15, 216, 25)
-                                : Colors.white,
-                            fontSize: 36,
-                            fontWeight: FontWeight.bold,
+                          const SizedBox(height: 4),
+                          Text(
+                            sinalDetectado == 'Nenhum' ? '-' : sinalDetectado,
+                            style: TextStyle(
+                              color:
+                                  sinalDetectado.toUpperCase() ==
+                                      sinalAlvo.toUpperCase()
+                                  ? const Color.fromARGB(255, 15, 216, 25)
+                                  : Colors.white,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.all(20),
-                clipBehavior: Clip.antiAlias,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                child: YOLOView(
-                  modelPath: 'assets/models/model.tflite',
-                  task: YOLOTask.detect,
-                  lensFacing: LensFacing.front,
-                  onResult: _processarResultados,
+                  ],
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 30),
-              child: Column(
-                children: [
-                  const Text(
-                    'Posicione sua mão na câmera',
-                    style: TextStyle(color: Colors.white, fontSize: 18),
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.all(20),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(25),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Confiança: ${(confianca * 100).toStringAsFixed(0)}%',
-                    style: const TextStyle(color: Colors.white70, fontSize: 16),
+                  child: YOLOView(
+                    modelPath: 'assets/models/model.tflite',
+                    task: YOLOTask.detect,
+                    lensFacing: LensFacing.front,
+                    onResult: _processarResultados,
                   ),
-                ],
+                ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.only(bottom: 30),
+                child: Column(
+                  children: [
+                    const Text(
+                      'Posicione sua mão na câmera',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Confiança: ${(confianca * 100).toStringAsFixed(0)}%',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
