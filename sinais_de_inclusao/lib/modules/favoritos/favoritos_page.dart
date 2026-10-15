@@ -231,7 +231,7 @@ class _FavoritosPageState extends State<FavoritosPage> {
 
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Color(0xFFF6F6F4),
 
           borderRadius: BorderRadius.circular(25),
 
