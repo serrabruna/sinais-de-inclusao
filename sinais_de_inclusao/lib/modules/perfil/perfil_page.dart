@@ -5,6 +5,7 @@ import 'package:sinais_de_inclusao/modules/planos/planos_page.dart';
 import 'package:sinais_de_inclusao/widgets/progresso_semanal.dart';
 import 'package:sinais_de_inclusao/widgets/gradient_background.dart';
 import 'package:sinais_de_inclusao/service/streak_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PerfilPage extends StatefulWidget {
   const PerfilPage({super.key});
@@ -252,6 +253,70 @@ class _PerfilPageState extends State<PerfilPage> {
     Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
   }
 
+  Future<void> _deletarConta() async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Excluir conta'),
+        content: const Text(
+          'Tem certeza de que deseja excluir sua conta permanentemente? Esta ação não pode ser desfeita e todos os seus dados serão perdidos.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Excluir'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar != true) return;
+
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(color: Colors.white),
+        ),
+      );
+
+      final dio = await DioClient.getInstance();
+      await dio.delete('/user/profile');
+
+      await StreakService.limparDadosLocais();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context); 
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao excluir conta: $e')),
+      );
+    }
+  }
+
+  Future<void> _abrirPoliticaPrivacidade() async {
+    final Uri url = Uri.parse('https://concrete-vulture-579.notion.site/Pol-tica-de-Privacidade-Sinais-de-Inclus-o-3f97e75931a980eb94daf8180e50de83?source=copy_link');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Não foi possível abrir a Política de Privacidade.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -437,7 +502,6 @@ class _PerfilPageState extends State<PerfilPage> {
                         const SizedBox(height: 25),
 
                         _botaoUpgradePremium(),
-
                         const SizedBox(height: 15),
 
                         SizedBox(
@@ -464,6 +528,48 @@ class _PerfilPageState extends State<PerfilPage> {
                                   width: 1.5,
                                 ),
                               ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: ElevatedButton.icon(
+                            onPressed: _deletarConta,
+                            icon: const Icon(Icons.delete_forever_rounded),
+                            label: const Text(
+                              'Excluir minha conta',
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red.withOpacity(0.2),
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                                side: const BorderSide(
+                                  color: Colors.redAccent,
+                                  width: 1.5,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        TextButton.icon(
+                          onPressed: _abrirPoliticaPrivacidade,
+                          icon: const Icon(Icons.privacy_tip_outlined, color: Colors.white70, size: 18),
+                          label: const Text(
+                            'Política de Privacidade',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              decoration: TextDecoration.underline,
+                              decorationColor: Colors.white70,
                             ),
                           ),
                         ),
