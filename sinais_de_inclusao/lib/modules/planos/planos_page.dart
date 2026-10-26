@@ -9,8 +9,7 @@ class PlanosPage extends StatefulWidget {
 }
 
 class _PlanosPageState extends State<PlanosPage> {
-  
-  int _planoSelecionado = 1; 
+  int _planoSelecionado = 1;
   bool _processandoAssinatura = false;
 
   final List<Map<String, dynamic>> _planos = [
@@ -48,7 +47,8 @@ class _PlanosPageState extends State<PlanosPage> {
     {
       'icone': Icons.auto_awesome_rounded,
       'titulo': 'Melhor Prática & Revisão',
-      'descricao': 'Modo de treino inteligente focado nos seus erros e dúvidas.',
+      'descricao':
+          'Modo de treino inteligente focado nos seus erros e dúvidas.',
       'cor': Colors.amber,
     },
   ];
@@ -61,8 +61,7 @@ class _PlanosPageState extends State<PlanosPage> {
     try {
       final plano = _planos[_planoSelecionado];
 
-      
-      await Future.delayed(const Duration(seconds: 2)); 
+      await Future.delayed(const Duration(seconds: 2));
 
       if (!mounted) return;
 
@@ -94,21 +93,27 @@ class _PlanosPageState extends State<PlanosPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF7458CF),
+      backgroundColor: const Color(0xFF9475EF),
+
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0xFF9475EF),
         elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         foregroundColor: Colors.white,
+
         leading: IconButton(
           icon: const Icon(Icons.close_rounded, size: 28),
           onPressed: () => Navigator.pop(context),
         ),
+
         actions: [
           TextButton(
             onPressed: () {
-              
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Restaurando compras anteriores...')),
+                const SnackBar(
+                  content: Text('Restaurando compras anteriores...'),
+                ),
               );
             },
             child: const Text(
@@ -121,14 +126,14 @@ class _PlanosPageState extends State<PlanosPage> {
           ),
         ],
       ),
-      extendBodyBehindAppBar: true,
       body: GradientBackground(
         child: SafeArea(
+          top: false,
+
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
             child: Column(
               children: [
-                
                 Container(
                   width: 80,
                   height: 80,
@@ -163,14 +168,10 @@ class _PlanosPageState extends State<PlanosPage> {
                 const Text(
                   'Desbloqueie todo o potencial com o Plano Premium',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.white70, fontSize: 14),
                 ),
                 const SizedBox(height: 25),
 
-                
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -185,12 +186,13 @@ class _PlanosPageState extends State<PlanosPage> {
                     ],
                   ),
                   child: Column(
-                    children: _beneficios.map((b) => _buildItemBeneficio(b)).toList(),
+                    children: _beneficios
+                        .map((b) => _buildItemBeneficio(b))
+                        .toList(),
                   ),
                 ),
                 const SizedBox(height: 25),
 
-                
                 Row(
                   children: List.generate(_planos.length, (index) {
                     final plano = _planos[index];
@@ -217,7 +219,6 @@ class _PlanosPageState extends State<PlanosPage> {
                 ),
                 const SizedBox(height: 25),
 
-                
                 Container(
                   width: double.infinity,
                   height: 56,
@@ -266,14 +267,10 @@ class _PlanosPageState extends State<PlanosPage> {
                 ),
                 const SizedBox(height: 16),
 
-                
                 const Text(
                   'A renovação é automática. Você pode cancelar a qualquer momento nas configurações da sua conta.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white60,
-                    fontSize: 11,
-                  ),
+                  style: TextStyle(color: Colors.white60, fontSize: 11),
                 ),
                 const SizedBox(height: 10),
               ],
@@ -318,10 +315,7 @@ class _PlanosPageState extends State<PlanosPage> {
                 const SizedBox(height: 2),
                 Text(
                   item['descricao'] as String,
-                  style: const TextStyle(
-                    color: Colors.black54,
-                    fontSize: 13,
-                  ),
+                  style: const TextStyle(color: Colors.black54, fontSize: 13),
                 ),
               ],
             ),
@@ -344,10 +338,14 @@ class _PlanosPageState extends State<PlanosPage> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 14),
             decoration: BoxDecoration(
-              color: selecionado ? Colors.white : Colors.white.withOpacity(0.85),
+              color: selecionado
+                  ? Colors.white
+                  : Colors.white.withOpacity(0.85),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: selecionado ? const Color(0xFFFFB46E) : Colors.transparent,
+                color: selecionado
+                    ? const Color(0xFFFFB46E)
+                    : Colors.transparent,
                 width: 3,
               ),
               boxShadow: [
@@ -364,9 +362,11 @@ class _PlanosPageState extends State<PlanosPage> {
                 Text(
                   plano['titulo'] as String,
                   style: TextStyle(
-                  color: selecionado ? const Color(0xFF623FBD) : Colors.black87,                    
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
+                    color: selecionado
+                        ? const Color(0xFF623FBD)
+                        : Colors.black87,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -397,20 +397,14 @@ class _PlanosPageState extends State<PlanosPage> {
                   Text(
                     plano['detalhe'] as String,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.black45,
-                      fontSize: 11,
-                    ),
+                    style: const TextStyle(color: Colors.black45, fontSize: 11),
                   ),
                 ] else if (plano['descricao'] != null) ...[
                   const SizedBox(height: 4),
                   Text(
                     plano['descricao'] as String,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.black45,
-                      fontSize: 11,
-                    ),
+                    style: const TextStyle(color: Colors.black45, fontSize: 11),
                   ),
                 ],
               ],
@@ -423,7 +417,10 @@ class _PlanosPageState extends State<PlanosPage> {
               right: 0,
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFF8A00),
                     borderRadius: BorderRadius.circular(12),
